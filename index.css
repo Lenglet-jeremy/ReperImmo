@@ -1,0 +1,49 @@
+*{
+    padding: 0px;
+    margin: 0px;
+}
+.ReperImmoPage{
+    background-color: #000000;
+    color: #FFFFFF;
+
+    .ReperImmoArea{
+        display: flex;
+        flex-direction: row;
+
+        width: 100vw;
+        min-height: 100vh;
+
+        .SideBarMenus{
+            width: 200px;
+
+            border: 1px solid #FFFFFF;
+
+        }
+
+        .ToolsMenu{
+            width: 200px;
+
+            border: 1px solid #FFFFFF;
+
+        }
+
+        .Body{
+            width: 100%;
+            
+            .BodyArea{
+                display: flex;
+                flex-direction: column;
+
+                border: 1px solid #FFFFFF;
+
+                .ToolsBar{
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+
+                    border: 1px solid #FFFFFF;
+                }
+            }
+        }
+    }
+}
