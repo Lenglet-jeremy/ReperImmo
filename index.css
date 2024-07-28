@@ -6,6 +6,9 @@
 .ReperImmoPage{
     background-color: #000000;
     color: #FFFFFF;
+    
+    /* background-color: #FFFFFF;
+    color: #000000; */
 
     .ReperImmoArea{
         display: flex;
@@ -15,7 +18,7 @@
         min-height: 100vh;
 
         .SideBarMenus{
-            width: 350px;
+            width: 400px;
 
             border: 1px solid #FFFFFF;
 
@@ -66,11 +69,44 @@
                     }
 
                     input{
-                        background-color: #FFFFFF;
+                        background-color: #FFFFFF00;
 
                         border: none;
 
                         margin-left: 5px;
+                    }
+
+                }
+
+                .EstateTools{
+                    margin-top: 20px;
+                    margin-left: 20px;
+
+
+                    .EstateSearch{
+
+                        background-color: #FFFFFF00;
+                        color: #FFFFFF;
+
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+
+                        border: none;
+    
+                        margin-top: 10px;
+                        margin-left: 10px;
+    
+                        img{
+                            width: 30px;
+                            height: 30px;
+    
+                            background-color: #FFFFFF;
+    
+                            border-radius: 10px;
+
+                            margin-right: 10px;
+                        }
                     }
 
                 }
