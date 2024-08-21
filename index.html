@@ -3,51 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="Index.css">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="./Front/1.0.sideBar/1.0.sideBar.css">
+    <link rel="stylesheet" href="./Front/2.0.toolsMenu/1.0.toolsMenu.css">
+    <link rel="stylesheet" href="./Front/3.0.toolsBar/1.0.toolsBar.css">
+    <link rel="stylesheet" href="./Front/4.0.content/1.0.content.css">
     <title>Document</title>
 </head>
 <body>
     <div class="ReperImmoPage">
         <div class="ReperImmoArea">
+            
+            <!-- Inclusion de la barre latérale -->
+            <div id="sidebar"></div>
+            
+            <!-- Inclusion du menu d'outils -->
+            <div id="toolsMenu"></div>
 
-            <div class="SideBarMenus">
-                <div class="LogoAndLabel">
-                    <img src="./img/LOGO.webp" alt="LOGO">
-                    <div class="Label">
-                        <h4>MeilleursBiens</h4>
-                        <p>MeilleursBiens.com</p>
-                    </div>
-
-                </div>
-
-                    <label class="GlobalSearch">
-                        <button><img src="./img/searchLens.webp" alt="SearchIcon"></button>
-                        <input placeholder="Recherche"/>
-                    </label>
-
-                    <div class="EstateTools">
-                        <p>LES OUTILS IMMOBILIERS</p>
-                        <button class="EstateSearch">
-                            <img src="./img/estateSearchIcon.webp" alt="icon">
-                            <p>Recherches Immobilières</p>
-                        </button>
-                    </div>
-            </div>
-
-            <div class="ToolsMenu">
-                <p>Outils du menu</p>
-            </div>
 
             <div class="Body">
+            
+            
+
                 <div class="BodyArea">
-                    <div class="ToolsBar">
-                        <p>OutilsGauche</p>
-                        <p>OutilsDroits</p>
-                    </div>
-                    <div class="Content">
-                        <p>Content</p>
-                    </div>
+                    <!-- Inclusion de la barre d'outils -->
+                    <div id="toolsBar"></div>
+                    <!-- Inclusion de la barre d'outils -->
+                    <div id="content"></div>
+                    
                 </div>
+
             </div>
 
         </div>
@@ -55,6 +40,6 @@
     </div>
 
 
-    <script src="./Index.js"></script>
+    <script src="./index.js"></script>
 </body>
 </html>

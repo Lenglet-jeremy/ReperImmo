@@ -1,0 +1,293 @@
+
+<div class="ToolsMenuArea">
+    <div class="ToolsMenu">
+        <div class="SavedResearh">
+            <p>Recherches sauvegardés</p>
+            <p>Recherches sauvegardés 1</p>
+            <p>Recherches sauvegardés 2</p>
+            <p>Recherches sauvegardés 3</p>
+        </div>
+        <br>
+
+        <p>Recherche par ville</p>
+        <div class="CityResearch">
+            <button><img src="./Front/img/searchLens.webp" class="SearchIcon" alt="SearchIcon"></button>
+            <input type="text" placeholder="Rechercher une ville"/>
+        </div>
+        
+        <p>Recherche avancé</p>
+        <div class="AdvancedCityResearch">
+            <div class="MainAdvancedCityResearch">
+                <button><img src="./Front/img/searchLens.webp" class="SearchIcon" alt="SearchIcon"></button>
+                <input type="text" placeholder="Rechercher une ville / une adresse"/>
+            </div>
+
+            <div class="SubAdvancedCityResearch">
+                <input type="text" placeholder="    50">
+                <p>km</p>
+                <ul>
+                    <li>De rayon</li>
+                    <!-- <li>En voiture</li>
+                    <li>A pied</li> -->
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="SortOrder">
+            <p>Trier par :</p>
+            <select id="sortOrder" class="dropdown">
+                <option value="desc" selected>Date de création Décroissante</option>
+                <option value="asc">Date de création Croissante</option>
+            </select>
+        </div>
+
+        <div class="AderTypesArea">
+            <p>Types d'annonceurs</p>
+            <div class="AdTypes">
+                <button>Pro</button>
+                <button>Particulier</button>
+            </div>
+        </div>
+
+        <div class="AdTypesArea">
+            <p>Types d'annonces</p>
+            <div class="AdTypes">
+                <button>Ventes</button>
+                <button>Locations</button>
+            </div>
+        </div>
+
+        <p>Catégorie</p>
+        <div class="FlagsCategorys">
+            <button>Maison</button>
+            <button>Appartement</button>
+            <button>Boutiques / Locaux</button>
+            <button>Bureaux</button>
+            <button>...</button>
+        </div>
+
+        <p>Budget</p>
+        <div class="Budget">
+            <div class="Min">
+                <p>Min</p>
+                <div class="Value">
+                    <input type="text">
+                    <p>€</p>
+                </div>
+            </div>
+            <div class="Max">
+                <p>Max</p>
+                <div class="Value">
+                    <input type="text">
+                    <p>€</p>
+                </div>
+            </div>
+        </div>
+
+        <p>Surface Habitable</p>
+        <div class="LivingSpace">
+            <div class="Min">
+                <p>Min</p>
+                <div class="Value">
+                    <input type="text">
+                    <p>M²</p>
+                </div>
+            </div>
+            <div class="Max">
+                <p>Max</p>
+                <div class="Value">
+                    <input type="text">
+                    <p>M²</p>
+                </div>
+            </div>
+        </div>
+
+        <p>Surface Terrain</p>
+        <div class="LandSurface">
+            <div class="Min">
+                <p>Min</p>
+                <div class="Value">
+                    <input type="text">
+                    <p>M²</p>
+                </div>
+            </div>
+            <div class="Max">
+                <p>Max</p>
+                <div class="Value">
+                    <input type="text">
+                    <p>M²</p>
+                </div>
+            </div>
+        </div>
+
+        <p>Nombre Chambres</p>
+        <div class="BedroomsNumber">
+            <div class="Min">
+                <p>Min</p>
+                <div class="Value">
+                    <input type="text">
+                </div>
+            </div>
+            <div class="Max">
+                <p>Max</p>
+                <div class="Value">
+                    <input type="text">
+                </div>
+            </div>
+        </div>
+
+        <p>Nombre Pieces</p>
+        <div class="PiecesNumber">
+            <div class="Min">
+                <p>Min</p>
+                <div class="Value">
+                    <input type="text">
+                </div>
+            </div>
+            <div class="Max">
+                <p>Max</p>
+                <div class="Value">
+                    <input type="text">
+                </div>
+            </div>
+        </div>
+
+        <h2>Plus de critere</h2>
+        <p>Type de projet</p>
+        <div class="ProjectType">
+
+            <label class="Old">
+                <input type="checkbox"/>
+                <p>Ancien</p>
+            </label>
+            
+
+            <label class="New">
+                <input type="checkbox"/>
+                <p>Neuf</p>
+            </label>
+            
+
+            <label class="LifeAnnuity">
+                <input type="checkbox"/>
+                <p>Viager</p>
+            </label>
+            
+
+            <label class="ConstructProject">
+                <input type="checkbox"/>
+                <p>Projet de construction</p>
+            </label>
+
+        </div>
+        
+        <p>Extérieur</p>
+        <div class="Outside">
+
+            <label class="Garden">
+                <img src="./Front/img/Jardin.png" alt="Jardin">
+                <p>Jardin</p>
+            </label>
+
+            <label class="Pool">
+                <img src="./Front/img/Piscine.png" alt="Piscine">
+                <p>Piscine</p>
+            </label>
+
+            <label class="Terrace">
+                <img src="./Front/img/Terrasse.png" alt="Terrasse">
+                <p>Piscine</p>
+            </label>
+
+            <label class="Balcony">
+                <img src="./Front/img/Balcon.png" alt="Balcon">
+                <p>Balcon</p>
+            </label>
+
+        </div>
+
+        <p>Surface Annexes</p>
+        <div class="AnnexesSurface">
+
+            <label class="Parking">
+                <input type="checkbox"/>
+                <p>Parking</p>
+            </label>
+            
+
+            <label class="Box">
+                <input type="checkbox"/>
+                <p>Box</p>
+            </label>
+            
+
+            <label class="Garage">
+                <input type="checkbox"/>
+                <p>Garage</p>
+            </label>
+            
+
+            <label class="Cave">
+                <input type="checkbox"/>
+                <p>Cave</p>
+            </label>
+            
+
+            <label class="Basement">
+                <input type="checkbox"/>
+                <p>Sous-sol</p>
+            </label>
+
+        </div>
+
+        <div class="dpe-scale">
+            <div class="dpe-item a"><span>≤ 50 A</span></div>
+            <div class="dpe-item b"><span>51 à 90 B</span></div>
+            <div class="dpe-item c"><span>91 à 150 C</span></div>
+            <div class="dpe-item d"><span>151 à 230 D</span></div>
+            <div class="dpe-item e"><span>231 à 330 E</span></div>
+            <div class="dpe-item f"><span>331 à 450 F</span></div>
+            <div class="dpe-item g"><span>> 450 G</span></div>
+        </div>
+        
+        <p>Critére par mots-clés</p>
+        <div class="container">
+            <div class="keywords">
+                <input type="text" placeholder="Essayez « Poutres apparentes », « Proche Métro »...">
+                <div class="tags">
+                    <span class="tag">Ancien</span>
+                    <span class="tag">Neuf</span>
+                    <span class="tag">Viager</span>
+                    <span class="tag">Projet de construction</span>
+                </div>
+            </div>
+    
+            <p>Affichage des annonces</p>
+            <div class="display-options">
+                <label><input type="checkbox"> Annonces avec photos</label>
+                <label><input type="checkbox"> Annonces avec vidéo</label>
+                <label><input type="checkbox"> Annonces avec visite virtuelle</label>
+                <label><input type="checkbox"> Exclusivité de l'agence</label>
+                <label><input type="checkbox"> Dont le prix a évolué</label>
+            </div>
+    
+            Emplacement
+            <div class="location">
+                <label><input type="checkbox"> Adresse exacte uniquement</label>
+            </div>
+    
+            <div class="footer">
+                <a href="#" class="cancel-link">Annuler</a>
+                <button class="apply-button">Appliquer</button>
+            </div>
+        </div>
+
+        <div class="Bottom">
+            <p>Réinitialiser</p>
+            <p>Recherche</p>
+            <p>Sauvegarder</p>
+        </div>
+
+    </div>
+</div>

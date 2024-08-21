@@ -1,7 +1,18 @@
 *{
     padding: 0px;
     margin: 0px;
+    list-style-type: none;
 }    
+.SearchIcon{
+    width: 20px;
+    height: 20px;
+
+    background-color: #FFFFFF;
+
+    border-radius: 10px;
+
+    margin-right: 10px;
+}
 
 .ReperImmoPage{
     background-color: #000000;
@@ -17,109 +28,6 @@
         width: 100vw;
         min-height: 100vh;
 
-        .SideBarMenus{
-            width: 400px;
-
-            border: 1px solid #FFFFFF;
-
-            .LogoAndLabel{
-                height: 50px;
-
-                display: flex;
-                flex-direction: row;
-
-                img{
-                    width: 50px;
-                    height: 50px;
-                }
-                .Label{
-                    color: #666666;
-
-                    h4{
-                        color: #FFFFFF;
-                    }
-                }
-            }
-                .GlobalSearch{
-                    
-                    width: 80%;
-                    height: 30px;
-                    
-                    background-color: #FFFFFF;
-                    color: #000000;
-
-                    border: 1px solid #000000;
-                    border-radius: 15px;
-
-                    display: flex;
-                    align-items: center;
-
-                    margin-left: 10px;
-
-                    button{
-                        background-color: #FFFFFF00;
-
-                        border: none;
-                        img{
-                            width: 20px;
-                            height: 20px;
-    
-                            margin-left: 5px;
-                        }
-                    }
-
-                    input{
-                        background-color: #FFFFFF00;
-
-                        border: none;
-
-                        margin-left: 5px;
-                    }
-
-                }
-
-                .EstateTools{
-                    margin-top: 20px;
-                    margin-left: 20px;
-
-
-                    .EstateSearch{
-
-                        background-color: #FFFFFF00;
-                        color: #FFFFFF;
-
-                        display: flex;
-                        flex-direction: row;
-                        align-items: center;
-
-                        border: none;
-    
-                        margin-top: 10px;
-                        margin-left: 10px;
-    
-                        img{
-                            width: 30px;
-                            height: 30px;
-    
-                            background-color: #FFFFFF;
-    
-                            border-radius: 10px;
-
-                            margin-right: 10px;
-                        }
-                    }
-
-                }
-
-        }
-
-        .ToolsMenu{
-            width: 350px;
-
-            border: 1px solid #FFFFFF;
-
-        }
-
         .Body{
             width: 100%;
             
@@ -128,14 +36,6 @@
                 flex-direction: column;
 
                 border: 1px solid #FFFFFF;
-
-                .ToolsBar{
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: space-between;
-
-                    border: 1px solid #FFFFFF;
-                }
             }
         }
     }
