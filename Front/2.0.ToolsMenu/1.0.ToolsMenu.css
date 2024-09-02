@@ -1,12 +1,13 @@
 
 .ToolsMenuArea{
-    .ToolsMenu{
         width: 300px;
-        
         height: calc(100vh - 14px); /* Ajuster la hauteur maximale */
+        overflow-x: hidden;
         overflow-y: scroll; /* Activer le défilement vertical */
-
         border: 1px solid #FFFFFF;
+    .ToolsMenu{
+        
+
 
         padding-top: 10px;
         padding-left: 20px;
@@ -337,25 +338,6 @@
             };
         }
 
-        .Bottom{
-            width: 280px;
-            height: 50px;
-            
-            background-color: #000000;
-
-            border: 1px solid #FFFFFF;
-
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-
-            position: absolute;
-            bottom: 0px;
-
-            padding: 0px 10px;
-
-        }
 
         .dpe-scale {
             width: 250px;
@@ -471,6 +453,25 @@
         .footer .cancel-link:hover {
             text-decoration: underline;
         }
+
+    }
+    .Bottom{
+        width: 280px;
+        height: 50px;
+        
+        background-color: #000000;
+
+        border: 1px solid #FFFFFF;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        position: absolute;
+        bottom: 0px;
+
+        padding: 0px 10px;
 
     }
 }

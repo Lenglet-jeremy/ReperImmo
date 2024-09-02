@@ -1,0 +1,52 @@
+*{
+    padding: 0px;
+    margin: 0px;
+    list-style-type: none;
+}    
+.SearchIcon{
+    width: 20px;
+    height: 20px;
+
+    background-color: #FFFFFF;
+
+    border-radius: 10px;
+
+    margin-right: 10px;
+}
+
+.ReperImmoPage{
+    background-color: #000000;
+    color: #FFFFFF;
+    
+    /* background-color: #FFFFFF;
+    color: #000000; */
+
+    .ReperImmoArea{
+        display: flex;
+        flex-direction: row;
+
+        width: 100vw;
+        min-height: 100vh;
+
+        .Body{
+            width: 100%;
+            
+            .BodyArea{
+                display: flex;
+                flex-direction: column;
+
+                border: 1px solid #FFFFFF;
+            }
+        }
+    }
+}
+
+
+
+@media (min-width: 768px) {
+
+}
+
+@media (min-width: 1024px) {
+
+}
