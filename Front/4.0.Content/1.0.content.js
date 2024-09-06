@@ -75,7 +75,7 @@ function loadAnnonces() {
                     addButton.style.alignItems = "center";
 
                     const hideButton = document.createElement("span");
-                    hideButton.innerText = "X";
+                    hideButton.innerHTML = "&times;";
                     hideButton.style.border = "1px solid #000000";
                     hideButton.style.fontSize = "18px";
                     hideButton.style.cursor = "pointer";

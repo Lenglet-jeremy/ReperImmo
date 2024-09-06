@@ -22,12 +22,59 @@ function formatDate(date) {
     return `${day}/${month}/${year}`;
 }
 
+// Route pour récupérer les annonces visibles (listées)
+app.get('/api/annonces/listed', async (req, res) => {
+    // try {
+    //     let annoncesVisibles = await AnnoncesGlobale.find({ toDisplay: true });
+        
+    //     console.log('Annonces listées récupérées:', annoncesVisibles);
+    //     res.json(annoncesVisibles);
+    // } catch (err) {
+    //     console.error('Erreur lors de la récupération des annonces listées:', err);
+    //     res.status(500).json({ message: err.message });
+    // }
+});
+
+// Route pour ajouter une annonce à la liste des annonces listées
+app.post('/api/annonces/listed', async (req, res) => {
+    try {
+        const { id, Titre, Prix, Image, Description, LienAnnonce } = req.body;
+
+        // Vérifier si l'annonce existe déjà
+        let annonce = await AnnoncesGlobale.findById(id);
+        if (!annonce) {
+            return res.status(404).json({ message: "Annonce non trouvée" });
+        }
+
+        // Ajouter ou mettre à jour les propriétés de l'annonce
+        annonce = await AnnoncesGlobale.findByIdAndUpdate(
+            id, 
+            {
+                Titre,
+                Prix,
+                Image,
+                Description,
+                LienAnnonce,
+                toDisplay: true  // Marquer l'annonce comme visible/listée
+            },
+            { new: true }
+        );
+
+        res.json({ message: "Annonce ajoutée à la liste avec succès", annonce });
+    } catch (err) {
+        console.error("Erreur lors de l'ajout de l'annonce à la liste:", err);
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
+
 // Route pour récupérer les annonces visibles
 app.get('/api/annonces', async (req, res) => {
     try {
         let annonces = await AnnoncesGlobale.find();
 
-        console.log('Annonces récupérées:', annonces);
+        // console.log('Annonces récupérées:', annonces);
         res.json(annonces);
     } catch (err) {
         console.error('Erreur lors de la récupération des annonces:', err);
@@ -77,6 +124,7 @@ app.put('/api/annonces/show', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
+
 
 
 // Lancer le serveur sur le port 5000
