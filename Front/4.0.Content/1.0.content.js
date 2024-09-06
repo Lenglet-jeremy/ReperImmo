@@ -1,11 +1,9 @@
-// content.js
-
-function loadAnnonces(showHidden = false) {
-    fetch('http://localhost:5000/api/annonces')
+function loadAnnonces() {
+    fetch("http://localhost:5000/api/annonces")
         .then(response => response.json())
         .then(data => {
-            const contentDiv = document.querySelector('.Content');
-            contentDiv.innerHTML = ''; // Clear previous content if any
+            const contentDiv = document.querySelector(".Content");
+            contentDiv.innerHTML = "";
 
             contentDiv.style.display = "flex";
             contentDiv.style.flexWrap = "wrap";
@@ -17,148 +15,148 @@ function loadAnnonces(showHidden = false) {
             contentDiv.style.padding = "20px";
 
             data.forEach(annonce => {
-                if (annonce.toDisplay || showHidden) {
-                const annonceDiv = document.createElement('div');
-                annonceDiv.classList.add('annonce');
-                annonceDiv.style.backgroundColor = "#444444";
-                annonceDiv.style.display = "flex";
-                annonceDiv.style.flexDirection = "column";
-                annonceDiv.style.border = "1px solid #ddd";
-                annonceDiv.style.borderRadius = "8px";
-                annonceDiv.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
-                annonceDiv.style.width = "320px";
-                annonceDiv.style.height = "400px";
-                annonceDiv.style.overflow = "hidden";
-                annonceDiv.style.transition = "transform 0.2s ease-in-out";
-                annonceDiv.style.cursor = "pointer";
-                annonceDiv.style.position = "relative"; // Nécessaire pour positionner la croix en absolu
+                if (annonce.toDisplay) {
+                    const annonceDiv = document.createElement("div");
+                    annonceDiv.classList.add("annonce");
+                    annonceDiv.style.backgroundColor = "#000000";
+                    annonceDiv.style.display = "flex";
+                    annonceDiv.style.flexDirection = "column";
+                    annonceDiv.style.border = "1px solid #ddd";
+                    annonceDiv.style.borderRadius = "8px";
+                    annonceDiv.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+                    annonceDiv.style.width = "400px";
+                    annonceDiv.style.height = "600px";
+                    annonceDiv.style.overflow = "hidden";
+                    annonceDiv.style.transition = "transform 0.2s ease-in-out";
+                    annonceDiv.style.cursor = "pointer";
+                    annonceDiv.style.position = "relative";
 
-                annonceDiv.addEventListener('mouseover', () => {
-                    annonceDiv.style.transform = "scale(1.02)";
-                });
-                annonceDiv.addEventListener('mouseout', () => {
-                    annonceDiv.style.transform = "scale(1)";
-                });
+                    // Ajout de l'image
+                    const img = document.createElement("img");
+                    img.src = annonce.Image;
+                    img.alt = annonce.Titre;
+                    img.style.width = "100%";
+                    img.style.height = "300px";
+                    img.style.objectFit = "cover";
 
-                // Image de l'annonce
-                const img = document.createElement('img');
-                img.src = annonce.Image;
-                img.alt = "Image de l'annonce";
-                img.style.width = "100%";
-                img.style.height = "180px";
-                img.style.objectFit = "cover";
-                annonceDiv.appendChild(img);
+                    annonceDiv.appendChild(img);
 
-                // Conteneur pour le texte
-                const textContainer = document.createElement('div');
-                textContainer.style.padding = "15px";
+                    // Conteneur pour le texte
+                    const textContainer = document.createElement("div");
+                    textContainer.style.padding = "15px";
 
-                // Conteneur pour le prix et la croix
-                const priceAndHideContainer = document.createElement('div');
-                priceAndHideContainer.style.display = "flex";
-                priceAndHideContainer.style.justifyContent = "space-between";
-                priceAndHideContainer.style.alignItems = "center";
+                    const priceAndHideContainer = document.createElement("div");
+                    priceAndHideContainer.style.display = "flex";
+                    priceAndHideContainer.style.justifyContent = "space-between";
+                    priceAndHideContainer.style.alignItems = "center";
 
-                // Prix
-                const prix = document.createElement('h2');
-                prix.textContent = annonce.Prix;
-                prix.style.margin = "0";
-                prix.style.fontSize = "22px";
-                prix.style.fontWeight = "bold";
-                priceAndHideContainer.appendChild(prix);
+                    const prix = document.createElement("h2");
+                    prix.textContent = annonce.Prix;
+                    prix.style.margin = "0";
+                    prix.style.fontSize = "22px";
+                    prix.style.fontWeight = "bold";
+                    priceAndHideContainer.appendChild(prix);
 
-                // Bouton pour masquer l'annonce (croix)
-                const hideButton = document.createElement('span');
-                hideButton.innerHTML = "&times;"; // HTML entity pour le symbole de la croix
-                hideButton.style.color = "#ff0000";
-                hideButton.style.fontSize = "24px";
-                hideButton.style.cursor = "pointer";
-                hideButton.addEventListener('click', () => {
-                    fetch(`http://localhost:5000/api/annonces/${annonce._id}/hide`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            annonceDiv.style.display = 'none';
-                        } else {
-                            console.error('Erreur lors du masquage de l\'annonce');
-                        }
-                    })
-                    .catch(error => console.error('Erreur lors de la requête pour masquer l\'annonce:', error));
-                });
-                priceAndHideContainer.appendChild(hideButton);
+                    const buttonContainer = document.createElement("div");
+                    buttonContainer.style.display = "flex";
+                    buttonContainer.style.gap = "10px";
 
-                textContainer.appendChild(priceAndHideContainer);
+                    const addButton = document.createElement("span");
+                    addButton.innerText = "+";
+                    addButton.style.border = "1px solid #000000";
+                    addButton.style.fontSize = "24px";
+                    addButton.style.cursor = "pointer";
+                    addButton.style.color = "#FF0000";
+                    addButton.style.width = "30px";
+                    addButton.style.height = "30px";
+                    addButton.style.borderRadius = "15px";
+                    addButton.style.display = "flex";
+                    addButton.style.justifyContent = "center";
+                    addButton.style.alignItems = "center";
 
-                // Ajout de la date d'ajout de l'annonce
-                const dateAjout = document.createElement('p');
-                dateAjout.textContent = `Ajoutée le : ${annonce.DateAjout}`;
-                dateAjout.style.margin = "5px 0";
-                dateAjout.style.fontSize = "12px";
-                dateAjout.style.color = "#bbb";
-                textContainer.appendChild(dateAjout);
+                    const hideButton = document.createElement("span");
+                    hideButton.innerText = "X";
+                    hideButton.style.border = "1px solid #000000";
+                    hideButton.style.fontSize = "18px";
+                    hideButton.style.cursor = "pointer";
+                    hideButton.style.width = "30px";
+                    hideButton.style.height = "30px";
+                    hideButton.style.borderRadius = "15px";
+                    hideButton.style.display = "flex";
+                    hideButton.style.justifyContent = "center";
+                    hideButton.style.alignItems = "center";
 
-                // Localisation
-                const localisation = document.createElement('p');
-                localisation.textContent = annonce.Localisation;
-                localisation.style.margin = "5px 0";
-                localisation.style.fontSize = "14px";
-                textContainer.appendChild(localisation);
+                    // Ajout du gestionnaire de clic pour cacher l'annonce
+                    hideButton.addEventListener("click", () => {
+                        // Mettre à jour toDisplay à false
+                        fetch(`http://localhost:5000/api/annonces/hide`, {
+                            method: "PUT",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                id: annonce._id, // Assurez-vous que 'annonce._id' est bien la propriété contenant l'ID unique
+                                toDisplay: false
+                            })
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                // Supprimer l'annonce du DOM
+                                contentDiv.removeChild(annonceDiv);
+                            } else {
+                                console.error("Erreur lors de la mise à jour de l'annonce.");
+                            }
+                        })
+                        .catch(error => console.error("Erreur lors de la requête:", error));
+                    });
 
-                // Description
-                const description = document.createElement('p');
-                description.textContent = annonce.Description;
-                description.style.margin = "5px 0";
-                description.style.fontSize = "16px";
-                description.style.fontWeight = "normal";
-                textContainer.appendChild(description);
+                    buttonContainer.appendChild(addButton);
+                    buttonContainer.appendChild(hideButton);
 
-                // Prix au m²
-                const prixaumcarre = document.createElement('div');
-                prixaumcarre.textContent = annonce.PrixAuMCarre;
-                prixaumcarre.style.marginTop = "10px";
-                prixaumcarre.style.padding = "8px";
-                prixaumcarre.style.backgroundColor = "#f6f6f6";
-                prixaumcarre.style.color = "#333";
-                prixaumcarre.style.fontSize = "14px";
-                prixaumcarre.style.borderRadius = "5px";
-                prixaumcarre.style.textAlign = "center";
-                textContainer.appendChild(prixaumcarre);
-                if (annonce.PrixAuMCarre === "") {
-                    prixaumcarre.style.display = "none"
-                }
+                    priceAndHideContainer.appendChild(buttonContainer);
+                    textContainer.appendChild(priceAndHideContainer);
 
-                annonceDiv.appendChild(textContainer);
-                
-                // Lien vers l'annonce
-                const link = document.createElement('a');
-                link.href = annonce.LienAnnonce;
-                link.textContent = "Voir l'annonce";
-                link.target = "_blank";
-                link.style.textDecoration = "none";
-                link.style.color = "#007bff";
-                link.style.display = "block";
-                link.style.textAlign = "center";
-                link.style.padding = "10px";
-                link.style.marginTop = "auto";
-                link.style.backgroundColor = "#e9ecef";
-                link.style.borderTop = "1px solid #ddd";
-                link.style.borderBottomLeftRadius = "8px";
-                link.style.borderBottomRightRadius = "8px";
-                annonceDiv.appendChild(link);
+                    const title = document.createElement("h3");
+                    title.textContent = annonce.Titre;
+                    title.style.margin = "10px 0";
+                    title.style.fontSize = "18px";
+                    textContainer.appendChild(title);
 
-                // Ajout du conteneur annonce au contentDiv
-                if (annonce.toDisplay || showHidden) {
+                    const description = document.createElement("p");
+                    description.textContent = annonce.Description;
+                    description.style.margin = "10px 0";
+                    description.style.fontSize = "14px";
+                    description.style.color = "#555";
+                    textContainer.appendChild(description);
+
+                    annonceDiv.appendChild(textContainer);
+
+                    const link = document.createElement("a");
+                    link.href = annonce.LienAnnonce;
+                    link.target = "_blanck"
+                    link.textContent = "Voir l'annonce";
+                    link.style.textAlign = "center";
+                    link.style.marginTop = "auto";
+                    link.style.padding = "15px 0";
+                    link.style.fontWeight = "bold";
+                    link.style.backgroundColor = "#f1f1f1";
+                    link.style.borderTop = "1px solid #ddd";
+                    annonceDiv.appendChild(link);
+
                     contentDiv.appendChild(annonceDiv);
+
+                    annonceDiv.addEventListener("mouseover", () => {
+                        annonceDiv.style.transform = "scale(1.05)";
+                        annonceDiv.style.boxShadow = "0 6px 10px rgba(0, 0, 0, 0.15)";
+                    });
+
+                    annonceDiv.addEventListener("mouseout", () => {
+                        annonceDiv.style.transform = "scale(1)";
+                        annonceDiv.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+                    });
+
                 }
-            }
             });
         })
-        .catch(error => console.error('Erreur lors de la récupération des annonces:', error));
+        .catch(error => console.error("Erreur lors du chargement des annonces:", error));
 }
-
-// Appeler la fonction loadAnnonces pour charger les annonces visibles lors du chargement de la page
-loadAnnonces();

@@ -4,15 +4,34 @@
         height: calc(100vh - 14px); /* Ajuster la hauteur maximale */
         overflow-x: hidden;
         overflow-y: scroll; /* Activer le défilement vertical */
-        border: 1px solid #FFFFFF;
+        border: 1px solid #000000;
     .ToolsMenu{
         
-
+        .Title{
+            height: 50px;
+            border-bottom: 1px solid #000000;
+            
+            p{
+                font-size: 22px;
+            }
+        }
 
         padding-top: 10px;
-        padding-left: 20px;
 
+        .SavedResearh{
+            padding-left: 20px;
+            padding-top: 20px;
 
+            .SavedResearhTitle{
+                font-size: 20px;
+                padding-left: 0px;
+                padding-bottom: 10px;
+
+            }
+            p{
+                padding-left: 20px;
+            }
+        }
 
         .CityResearch{
             background-color: #FFFFFF;
@@ -458,10 +477,10 @@
     .Bottom{
         width: 280px;
         height: 50px;
-        
+
         background-color: #000000;
 
-        border: 1px solid #FFFFFF;
+        border-top: 1px solid #ffffff;
 
         display: flex;
         flex-direction: row;
@@ -472,6 +491,7 @@
         bottom: 0px;
 
         padding: 0px 10px;
+        margin: 0;
 
     }
 }

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require("dotenv").config();
 const app = express();
-const LeboncoinGlobale = require('./models/leboncoin');
+const AnnoncesGlobale = require('./models/AnnoncesGlobale');
 
 // Middleware pour permettre les requêtes cross-origin (depuis un autre domaine)
 app.use(cors());
@@ -25,23 +25,7 @@ function formatDate(date) {
 // Route pour récupérer les annonces visibles
 app.get('/api/annonces', async (req, res) => {
     try {
-        // Utilisation de .lean() pour obtenir des objets JavaScript natifs
-        let annonces = await LeboncoinGlobale.find().lean();
-
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-
-        // Traitement des annonces pour remplacer "aujourd'hui" et "hier" par les dates correspondantes
-        annonces = annonces.map(annonce => {
-
-            // Ajouter dynamiquement la propriété toDisplay avec la valeur true si elle n'existe pas
-            if (annonce.toDisplay === undefined) {
-                annonce.toDisplay = true;
-            }
-
-            return annonce;
-        });
+        let annonces = await AnnoncesGlobale.find();
 
         console.log('Annonces récupérées:', annonces);
         res.json(annonces);
@@ -52,15 +36,44 @@ app.get('/api/annonces', async (req, res) => {
 });
 
 // Route pour masquer une annonce
-app.put('/api/annonces/:id/hide', async (req, res) => {
+app.put('/api/annonces/hide', async (req, res) => {
     try {
-        const annonce = await LeboncoinGlobale.findByIdAndUpdate(req.params.id, { toDisplay: false }, { new: true });
+        const annonceId = req.body.id;
+        const annonce = await AnnoncesGlobale.findByIdAndUpdate(annonceId, { toDisplay: false }, { new: true });
         if (!annonce) {
             return res.status(404).json({ message: 'Annonce non trouvée' });
         }
         res.json({ message: 'Annonce masquée avec succès' });
     } catch (err) {
         console.error('Erreur lors du masquage de l\'annonce:', err);
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Route pour récupérer les annonces cachées
+app.get('/api/annonces/hide', async (req, res) => {
+    try {
+        let annoncesCachees = await AnnoncesGlobale.find({ toDisplay: false });
+        
+        console.log('Annonces cachées récupérées:', annoncesCachees);
+        res.json(annoncesCachees);
+    } catch (err) {
+        console.error('Erreur lors de la récupération des annonces cachées:', err);
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Route pour réafficher une annonce masquée
+app.put('/api/annonces/show', async (req, res) => {
+    try {
+        const annonceId = req.body.id;
+        const annonce = await AnnoncesGlobale.findByIdAndUpdate(annonceId, { toDisplay: true }, { new: true });
+        if (!annonce) {
+            return res.status(404).json({ message: 'Annonce non trouvée' });
+        }
+        res.json({ message: 'Annonce réaffichée avec succès' });
+    } catch (err) {
+        console.error('Erreur lors du réaffichage de l\'annonce:', err);
         res.status(500).json({ message: err.message });
     }
 });
