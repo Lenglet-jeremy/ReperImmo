@@ -15,8 +15,10 @@ const Annonces = new mongoose.Schema({
     IdentiteAuteurAnnonce2: { type: String, default: "" },
     DateAjoutLBC: { type: String, default: "" },
     DateAjoutReperimmo: { type: String, default: "" },
-    toDisplay: { type: Boolean, default: true }
+    toDisplay: { type: Boolean, default: true },
+    category: { type: String, default: "Autres" }  // Champ catégorie ajouté
 }, { collection: 'Rennes' });
+
 
 
 const AnnoncesGlobale = mongoose.model('Leboncoin', Annonces);

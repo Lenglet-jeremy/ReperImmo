@@ -74,6 +74,32 @@ function loadAnnonces() {
                     addButton.style.justifyContent = "center";
                     addButton.style.alignItems = "center";
 
+                    // Ajout du gestionnaire de clic pour envoyer l'annonce
+                    addButton.addEventListener("click", () => {
+                        fetch("http://localhost:5000/api/annonces/listed", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                id: annonce._id // Utilisez l'ID unique de l'annonce
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message) {
+                                console.log("Annonce ajoutée à la liste avec succès.");
+                            } else {
+                                console.error("Erreur lors de l'ajout de l'annonce.");
+                            }
+                        })
+                        .catch(error => console.error("Erreur lors de la requête:", error));
+                    });
+
+                    // Append the button to the div or container
+                    buttonContainer.appendChild(addButton);
+
+
                     const hideButton = document.createElement("span");
                     hideButton.innerHTML = "&times;";
                     hideButton.style.border = "1px solid #000000";

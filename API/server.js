@@ -4,6 +4,8 @@ const cors = require('cors');
 require("dotenv").config();
 const app = express();
 const AnnoncesGlobale = require('./models/AnnoncesGlobale');
+const ListedAnnonces = [];  // On va utiliser un tableau en mémoire pour stocker temporairement les annonces sélectionnées
+
 
 // Middleware pour permettre les requêtes cross-origin (depuis un autre domaine)
 app.use(cors());
@@ -14,55 +16,60 @@ mongoose.connect(process.env.MONGO_URI, process.env.MONGO_OPTIONS)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Could not connect to MongoDB:', err));
 
-// Fonction pour formater la date
-function formatDate(date) {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-}
 
-// Route pour récupérer les annonces visibles (listées)
-app.get('/api/annonces/listed', async (req, res) => {
-    // try {
-    //     let annoncesVisibles = await AnnoncesGlobale.find({ toDisplay: true });
-        
-    //     console.log('Annonces listées récupérées:', annoncesVisibles);
-    //     res.json(annoncesVisibles);
-    // } catch (err) {
-    //     console.error('Erreur lors de la récupération des annonces listées:', err);
-    //     res.status(500).json({ message: err.message });
-    // }
+
+
+// Route pour récupérer les annonces listées
+app.get('/api/annonces/listed', (req, res) => {
+    try {
+        // Renvoie les annonces sélectionnées
+        res.json(ListedAnnonces);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
 // Route pour ajouter une annonce à la liste des annonces listées
 app.post('/api/annonces/listed', async (req, res) => {
     try {
-        const { id, Titre, Prix, Image, Description, LienAnnonce } = req.body;
+        const { id } = req.body;
 
-        // Vérifier si l'annonce existe déjà
-        let annonce = await AnnoncesGlobale.findById(id);
-        if (!annonce) {
-            return res.status(404).json({ message: "Annonce non trouvée" });
+        // Vérifier si l'annonce est déjà dans la liste
+        const annonceExistante = ListedAnnonces.find(annonce => annonce._id === id);
+        if (annonceExistante) {
+            return res.status(400).json({ message: "L'annonce est déjà listée." });
         }
 
-        // Ajouter ou mettre à jour les propriétés de l'annonce
-        annonce = await AnnoncesGlobale.findByIdAndUpdate(
-            id, 
-            {
-                Titre,
-                Prix,
-                Image,
-                Description,
-                LienAnnonce,
-                toDisplay: true  // Marquer l'annonce comme visible/listée
-            },
-            { new: true }
-        );
+        // Trouver l'annonce dans la base de données globale
+        const annonce = await AnnoncesGlobale.findById(id);
+        if (!annonce) {
+            return res.status(404).json({ message: "Annonce non trouvée." });
+        }
 
-        res.json({ message: "Annonce ajoutée à la liste avec succès", annonce });
+        // Ajouter l'annonce à la liste des annonces sélectionnées
+        ListedAnnonces.push(annonce);
+
+        res.status(201).json({ message: "Annonce ajoutée avec succès." });
     } catch (err) {
-        console.error("Erreur lors de l'ajout de l'annonce à la liste:", err);
+        console.error("Erreur lors de l'ajout de l'annonce:", err);
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Route pour associer une catégorie à une annonce
+app.post('/api/annonces/category', async (req, res) => {
+    try {
+        const { id, category } = req.body;
+        
+        // Mettre à jour l'annonce avec la catégorie sélectionnée
+        const annonce = await AnnoncesGlobale.findByIdAndUpdate(id, { category }, { new: true });
+        if (!annonce) {
+            return res.status(404).json({ message: "Annonce non trouvée." });
+        }
+
+        res.status(200).json({ message: "Catégorie ajoutée avec succès." });
+    } catch (err) {
+        console.error("Erreur lors de l'ajout de la catégorie:", err);
         res.status(500).json({ message: err.message });
     }
 });
