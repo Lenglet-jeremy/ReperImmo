@@ -80,9 +80,7 @@ app.post('/api/annonces/category', async (req, res) => {
 app.get('/api/annonces', async (req, res) => {
     try {
         let annonces = await AnnoncesGlobale.find();
-
-        // console.log('Annonces récupérées:', annonces);
-        res.json(annonces);
+        res.json({annonces});
     } catch (err) {
         console.error('Erreur lors de la récupération des annonces:', err);
         res.status(500).json({ message: err.message });

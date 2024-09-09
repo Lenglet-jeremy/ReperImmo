@@ -14,25 +14,38 @@
     <div class="ReperImmoPage">
         <div class="ReperImmoArea">
             
-            <!-- Inclusion de la barre latérale -->
             <div id="sidebar"></div>
-            
-            <!-- Inclusion du menu d'outils -->
             <div id="toolsMenu"></div>
 
             <div class="Body">
                 <div class="BodyArea">
-                    <!-- Inclusion de la barre d'outils -->
                     <div id="toolsBar"></div>
-                    <!-- Inclusion de la barre d'outils -->
                     <div id="content"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="./index.js"></script>
+
     <script src="./3.0.ToolsBar/1.0.ToolsBar.js"></script>
     <script src="./4.0.content/1.0.content.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            loadPartial('sidebar', './1.0.sideBar/1.0.sideBar.html');
+            loadPartial('toolsMenu', './2.0.toolsMenu/1.0.toolsMenu.html', loadAnnonces);
+            loadPartial('toolsBar', './3.0.toolsBar/1.0.toolsBar.html', gestionAnnonces);
+            loadPartial('content', './4.0.content/1.0.content.html', loadAnnonces); // Chargement des annonces après l'injection du contenu
+        });
+        
+        function loadPartial(id, url, callback) {
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById(id).innerHTML = data;
+                    if (callback) callback();
+                });
+        }
+    </script>
 </body>
 </html>

@@ -296,5 +296,3 @@ function gestionAnnonces() {
     AnnoncesMasquees();  // Gérer les annonces masquées
     AnnoncesListees();   // Gérer les annonces listées
 }
-
-gestionAnnonces();  // Initialiser la gestion des événements

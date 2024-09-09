@@ -75,20 +75,21 @@
         <p>Budget</p>
         <div class="Budget">
             <div class="Min">
-                <p>Min</p>
+                <p class="TEST">Min</p>
                 <div class="Value">
-                    <input type="text">
+                    <input type="text" id="minPrice" placeholder="50"></input>
                     <p>€</p>
                 </div>
             </div>
             <div class="Max">
                 <p>Max</p>
                 <div class="Value">
-                    <input type="text">
+                    <input type="text" id="maxPrice">
                     <p>€</p>
                 </div>
             </div>
         </div>
+        
 
         <p>Surface Habitable</p>
         <div class="LivingSpace">
@@ -281,10 +282,9 @@
             <div class="location">
                 <label><input type="checkbox"> Adresse exacte uniquement</label>
             </div>
-    
+            
             <div class="footer">
-                <a href="#" class="cancel-link">Annuler</a>
-                <button class="apply-button">Appliquer</button>
+                <button class="apply-button" id="applyFilter">Appliquer</button>
             </div>
         </div>
 
@@ -296,3 +296,5 @@
         <p>Sauvegarder</p>
     </div>
 </div>
+
+<script src="./1.0.ToolsMenu.js"></script>
