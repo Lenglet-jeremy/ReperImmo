@@ -1,12 +1,64 @@
-// Fonction pour créer et gérer les onglets (seulement pour les "Annonces Listées")
+// Fonction pour créer et gérer les sous-onglets
+function createSubTabs(tabContainer) {
+    const subTabContainer = document.createElement("div");
+    subTabContainer.style.display = "flex";
+    subTabContainer.style.position = "absolute";  // Rend le conteneur flottant
+    subTabContainer.style.marginTop = "0";        // Supprime la marge supérieure
+    subTabContainer.style.top = "100%";           // Positionne le conteneur juste sous l'onglet principal
+    subTabContainer.style.left = "0";             // Aligne le conteneur à gauche
+    subTabContainer.style.border = "1px solid #FFFFFF";
+    subTabContainer.style.overflowX = "scroll";
+    subTabContainer.style.backgroundColor = "#666666"; // Contexte pour le rendre visible
+
+    const subTabsWrapper = document.createElement("div");
+    subTabsWrapper.style.height = "100%"
+    subTabsWrapper.style.display = "flex";
+
+    const createSubTab = (text = "Sous-onglet") => {
+        const subTab = document.createElement("div");
+        subTab.style.padding = "5px 10px";
+        subTab.style.border = "1px solid #ccc";
+        subTab.style.backgroundColor = "#666666";
+        subTab.style.marginRight = "5px";
+        subTab.style.cursor = "pointer";
+        
+        const subTabContent = document.createElement("span");
+        subTabContent.innerText = text;
+        subTab.appendChild(subTabContent);
+
+        subTabsWrapper.appendChild(subTab);
+    };
+
+    const addSubTabButton = document.createElement("button");
+    addSubTabButton.innerText = "+ Sous-onglet";
+    addSubTabButton.style.padding = "5px 10px";
+    addSubTabButton.style.border = "none";
+    addSubTabButton.style.backgroundColor = "#f0f0f0";
+    addSubTabButton.style.cursor = "pointer";
+
+    addSubTabButton.addEventListener("click", () => {
+        createSubTab("Nouveau sous-onglet");
+    });
+
+    subTabContainer.appendChild(subTabsWrapper);
+    subTabContainer.appendChild(addSubTabButton);
+
+
+    return subTabContainer;
+}
+
+// Modification de la fonction pour créer des onglets avec sous-onglets
 function createTabs(container) {
     const tabContainer = document.createElement("div");
     tabContainer.style.display = "flex";
     tabContainer.style.flexGrow = "1";
-    tabContainer.style.position = "absolute";
-    tabContainer.style.top = "10px";
-    tabContainer.style.left = "20px";
-    tabContainer.style.right = "20px";
+    tabContainer.style.position = "fixed";
+    tabContainer.style.border = "1px solid #FFFFFF";
+    tabContainer.style.height = "100%";
+    tabContainer.style.overflowX = "scroll";
+    tabContainer.style.top = "0px";
+    tabContainer.style.left = "0px";
+    tabContainer.style.right = "0px";
 
     const tabsWrapper = document.createElement("div");
     tabsWrapper.style.display = "flex";
@@ -29,47 +81,81 @@ function createTabs(container) {
         const tab = document.createElement("div");
         tab.style.display = "flex";
         tab.style.alignItems = "center";
-        tab.style.padding = "5px 10px";
+        tab.style.height = "50px";
+        tab.style.marginLeft = "5px";
         tab.style.border = "1px solid #ccc";
         tab.style.borderRadius = "4px";
-        tab.style.marginRight = "5px";
         tab.style.backgroundColor = "#000000";
-        tab.contentEditable = false;
-
+        tab.style.marginRight = "5px";
+        tab.style.cursor = "pointer";
+    
         const tabContent = document.createElement("span");
         tabContent.style.flexGrow = "1";
         tabContent.innerText = text;
         tab.appendChild(tabContent);
-
-        tab.addEventListener("dblclick", () => {
-            tabContent.contentEditable = true;
-            tabContent.focus();
+    
+        // Double-clic pour éditer le texte de l'onglet
+        tabContent.addEventListener("dblclick", () => {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.value = tabContent.innerText;
+            input.style.flexGrow = "1";
+            input.style.padding = "5px";
+            input.style.border = "none";
+            input.style.outline = "none";
+    
+            tab.replaceChild(input, tabContent);
+    
+            input.addEventListener("blur", () => {
+                tabContent.innerText = input.value || "Onglet sans nom";
+                tab.replaceChild(tabContent, input);
+                saveTabsToLocalStorage(); // Sauvegarde le nouveau nom de l'onglet
+            });
+    
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    input.blur();
+                }
+            });
+    
+            input.focus();
         });
-
-        tabContent.addEventListener("blur", () => {
-            tabContent.contentEditable = false;
-            saveTabsToLocalStorage();
+    
+        tab.addEventListener("click", () => {
+            const subTabContainer = tab.querySelector(".sub-tabs");
+            if (!subTabContainer) {
+                createSubTabs(tab); // Crée les sous-onglets à la volée quand on clique sur l'onglet
+            }
         });
-
+    
         const closeButton = document.createElement("span");
         closeButton.innerHTML = "&times;";
-        closeButton.style.marginLeft = "10px";
         closeButton.style.cursor = "pointer";
         closeButton.style.color = "#FFFFFF";
-
+        closeButton.style.display = "flex";
+        closeButton.style.justifyContent = "center";
+        closeButton.style.alignItems = "center";
+        closeButton.style.width = "30px";  // Largeur du bouton
+        closeButton.style.height = "30px"; // Hauteur du bouton
+        closeButton.style.fontSize = "30px"; // Hauteur du bouton
+        closeButton.style.borderRadius = "50%"; // Optionnel : pour rendre le bouton rond
+    
+    
         closeButton.addEventListener("click", () => {
             tabsWrapper.removeChild(tab);
             saveTabsToLocalStorage();
         });
-
+    
         tab.appendChild(closeButton);
         tabsWrapper.appendChild(tab);
     };
+    
 
     const addTabButton = document.createElement("button");
     addTabButton.innerText = "+";
     addTabButton.style.padding = "5px 10px";
-    addTabButton.style.marginLeft = "5px";
+    addTabButton.style.height = "50px";
+    addTabButton.style.marginRight = "50px";
     addTabButton.style.border = "none";
     addTabButton.style.backgroundColor = "#f0f0f0";
     addTabButton.style.cursor = "pointer";
@@ -86,18 +172,22 @@ function createTabs(container) {
     container.appendChild(tabContainer);
 }
 
+
 // Fonction GetData pour AnnoncesMasquees et AnnoncesListees
 async function GetData(route, container, includeTabs = false) {
     container.innerHTML = '';
 
     const closeModalButton = document.createElement("span");
     closeModalButton.style.color = "#FFFFFF";
-    closeModalButton.style.top = "10px";
-    closeModalButton.style.right = "10px";
-    closeModalButton.style.width = "30px";
-    closeModalButton.style.height = "30px";
+    closeModalButton.style.backgroundColor = "#000000";
+    closeModalButton.style.top = "0px";
+    closeModalButton.style.right = "0px";
+    closeModalButton.style.width = "50px";
+    closeModalButton.style.height = "50px";
+    closeModalButton.style.border = "1px solid #FFFFFF";
     closeModalButton.style.fontSize = "30px";
     closeModalButton.style.position = "absolute";
+    closeModalButton.style.textAlign = "center";
     closeModalButton.innerHTML = "&times;";
     closeModalButton.style.cursor = "pointer";
     closeModalButton.addEventListener("click", () => {
@@ -129,7 +219,7 @@ async function GetData(route, container, includeTabs = false) {
     }
 }
 
-// Fonction pour afficher les annonces masquées
+
 function AnnoncesMasquees() {
     const contentDiv = document.querySelector(".ToolsBar");
     const modalMasquees = document.createElement("div");
@@ -219,8 +309,6 @@ function AnnoncesMasquees() {
     });
 }
 
-// Fonction pour afficher les annonces listées
-// Fonction pour afficher les annonces listées
 function AnnoncesListees() {
     const contentDiv = document.querySelector(".ToolsBar");
     const modalList = document.createElement("div");
@@ -267,7 +355,7 @@ function AnnoncesListees() {
                 annonceDiv.style.borderRadius = "8px";
                 annonceDiv.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
                 annonceDiv.style.width = "400px";
-                annonceDiv.style.height = "600px";
+                annonceDiv.style.height = "400px";
                 annonceDiv.style.overflow = "hidden";
                 annonceDiv.style.transition = "transform 0.2s ease-in-out";
                 annonceDiv.style.cursor = "pointer";
@@ -277,7 +365,7 @@ function AnnoncesListees() {
                 img.src = annonce.image; // Corrigez le nom du champ
                 img.alt = annonce.title; // Corrigez le nom du champ
                 img.style.width = "100%";
-                img.style.height = "300px";
+                img.style.height = "200px";
                 img.style.objectFit = "cover";
                 annonceDiv.appendChild(img);
                 
