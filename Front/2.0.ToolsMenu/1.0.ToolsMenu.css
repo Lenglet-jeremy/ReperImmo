@@ -149,10 +149,9 @@
 
         .FlagsCategorys{
             margin-bottom: 30px;
-            button{
-                height: 30px;
-                padding: 0px 10px;
-            }
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .Budget{
@@ -255,7 +254,7 @@
 
                 input{
                     border: none;
-                    width: 80px;
+                    width: 110px;
                 }
                 p{
                     margin-left: 5px;
@@ -282,7 +281,7 @@
 
                 input{
                     border: none;
-                    width: 80px;
+                    width: 110px;
                 }
                 p{
                     margin-left: 5px;

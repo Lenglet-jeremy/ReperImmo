@@ -65,19 +65,47 @@
 
         <p>Catégorie</p>
         <div class="FlagsCategorys">
-            <button>Maison</button>
-            <button>Appartement</button>
-            <button>Immeuble</button>
-            <button>Garage</button>
-            <button>Autres</button>
+            <label>
+                <input type="checkbox" name="category" value="Maison">
+                Maison
+            </label>
+            <label>
+                <input type="checkbox" name="category" value="Appartement">
+                Appartement
+            </label>
+            <label>
+                <input type="checkbox" name="category" value="Immeuble">
+                Immeuble
+            </label>
+            <label>
+                <input type="checkbox" name="category" value="Garage">
+                Garage
+            </label>
+            <label>
+                <input type="checkbox" name="category" value="Loft">
+                Loft
+            </label>
+            <label>
+                <input type="checkbox" name="category" value="Villa">
+                Villa
+            </label>
+            <label>
+                <input type="checkbox" name="category" value="Terrain">
+                Terrain
+            </label>
+            <label>
+                <input type="checkbox" name="category" value="Autres">
+                Autres
+            </label>
         </div>
 
-        <p>Budget</p>
+
+        <p style="color: #00FF00;"> Budget </p>
         <div class="Budget">
             <div class="Min">
                 <p class="TEST">Min</p>
                 <div class="Value">
-                    <input type="text" id="minPrice" placeholder="50"></input>
+                    <input type="text" id="minPrice"></input>
                     <p>€</p>
                 </div>
             </div>
@@ -91,19 +119,19 @@
         </div>
         
 
-        <p>Surface Habitable</p>
+        <p style="color: #00FF00;">Surface Habitable</p>
         <div class="LivingSpace">
             <div class="Min">
                 <p>Min</p>
                 <div class="Value">
-                    <input type="text">
+                    <input type="text" id="minSurface">
                     <p>M²</p>
                 </div>
             </div>
             <div class="Max">
                 <p>Max</p>
                 <div class="Value">
-                    <input type="text">
+                    <input type="text" id="maxSurface">
                     <p>M²</p>
                 </div>
             </div>
@@ -143,18 +171,18 @@
             </div>
         </div>
 
-        <p>Nombre Pieces</p>
+        <p style="color: #00FF00;">Nombre Pieces</p>
         <div class="PiecesNumber">
             <div class="Min">
                 <p>Min</p>
                 <div class="Value">
-                    <input type="text">
+                    <input type="text" id="minNbPiece">
                 </div>
             </div>
             <div class="Max">
                 <p>Max</p>
                 <div class="Value">
-                    <input type="text">
+                    <input type="text" id="maxNbPiece">
                 </div>
             </div>
         </div>

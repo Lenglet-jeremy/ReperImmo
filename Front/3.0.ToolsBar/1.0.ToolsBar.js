@@ -1,21 +1,112 @@
-async function GetData(route, container) {
-    // Vider le contenu précédent du conteneur
-    container.innerHTML = ''; 
+// Fonction pour créer et gérer les onglets (seulement pour les "Annonces Listées")
+function createTabs(container) {
+    const tabContainer = document.createElement("div");
+    tabContainer.style.display = "flex";
+    tabContainer.style.flexGrow = "1";
+    tabContainer.style.position = "absolute";
+    tabContainer.style.top = "10px";
+    tabContainer.style.left = "20px";
+    tabContainer.style.right = "20px";
+
+    const tabsWrapper = document.createElement("div");
+    tabsWrapper.style.display = "flex";
+
+    const saveTabsToLocalStorage = () => {
+        const tabTexts = Array.from(tabsWrapper.children).map(tab => tab.querySelector('span').innerText);
+        localStorage.setItem('tabs', JSON.stringify(tabTexts));
+    };
+
+    const loadTabsFromLocalStorage = () => {
+        const savedTabs = JSON.parse(localStorage.getItem('tabs'));
+        if (savedTabs && savedTabs.length > 0) {
+            savedTabs.forEach(tabText => createTab(tabText));
+        } else {
+            createTab("Annonces listées");
+        }
+    };
+
+    const createTab = (text = "Annonces listées") => {
+        const tab = document.createElement("div");
+        tab.style.display = "flex";
+        tab.style.alignItems = "center";
+        tab.style.padding = "5px 10px";
+        tab.style.border = "1px solid #ccc";
+        tab.style.borderRadius = "4px";
+        tab.style.marginRight = "5px";
+        tab.style.backgroundColor = "#000000";
+        tab.contentEditable = false;
+
+        const tabContent = document.createElement("span");
+        tabContent.style.flexGrow = "1";
+        tabContent.innerText = text;
+        tab.appendChild(tabContent);
+
+        tab.addEventListener("dblclick", () => {
+            tabContent.contentEditable = true;
+            tabContent.focus();
+        });
+
+        tabContent.addEventListener("blur", () => {
+            tabContent.contentEditable = false;
+            saveTabsToLocalStorage();
+        });
+
+        const closeButton = document.createElement("span");
+        closeButton.innerHTML = "&times;";
+        closeButton.style.marginLeft = "10px";
+        closeButton.style.cursor = "pointer";
+        closeButton.style.color = "#FFFFFF";
+
+        closeButton.addEventListener("click", () => {
+            tabsWrapper.removeChild(tab);
+            saveTabsToLocalStorage();
+        });
+
+        tab.appendChild(closeButton);
+        tabsWrapper.appendChild(tab);
+    };
+
+    const addTabButton = document.createElement("button");
+    addTabButton.innerText = "+";
+    addTabButton.style.padding = "5px 10px";
+    addTabButton.style.marginLeft = "5px";
+    addTabButton.style.border = "none";
+    addTabButton.style.backgroundColor = "#f0f0f0";
+    addTabButton.style.cursor = "pointer";
+
+    addTabButton.addEventListener("click", () => {
+        createTab("Nouvel onglet");
+        saveTabsToLocalStorage();
+    });
+
+    loadTabsFromLocalStorage();
+
+    tabContainer.appendChild(tabsWrapper);
+    tabContainer.appendChild(addTabButton);
+    container.appendChild(tabContainer);
+}
+
+// Fonction GetData pour AnnoncesMasquees et AnnoncesListees
+async function GetData(route, container, includeTabs = false) {
+    container.innerHTML = '';
 
     const closeModalButton = document.createElement("span");
     closeModalButton.style.color = "#FFFFFF";
     closeModalButton.style.top = "10px";
-    closeModalButton.style.right = "20px";
-    closeModalButton.style.width = "20px";
-    closeModalButton.style.height = "20px";
+    closeModalButton.style.right = "10px";
+    closeModalButton.style.width = "30px";
+    closeModalButton.style.height = "30px";
     closeModalButton.style.fontSize = "30px";
     closeModalButton.style.position = "absolute";
     closeModalButton.innerHTML = "&times;";
     closeModalButton.style.cursor = "pointer";
-    
     closeModalButton.addEventListener("click", () => {
         container.style.display = "none";
     });
+
+    if (includeTabs) {
+        createTabs(container);
+    }
 
     container.appendChild(closeModalButton);
 
@@ -26,6 +117,11 @@ async function GetData(route, container) {
                 "Content-Type": "application/json"
             }
         });
+
+        if (!response.ok) {
+            throw new Error('Erreur lors de la récupération des données');
+        }
+
         const data = await response.json();
         return data;
     } catch (error) {
@@ -33,12 +129,13 @@ async function GetData(route, container) {
     }
 }
 
+// Fonction pour afficher les annonces masquées
 function AnnoncesMasquees() {
     const contentDiv = document.querySelector(".ToolsBar");
     const modalMasquees = document.createElement("div");
 
-    modalMasquees.style.width = "1000px"; 
-    modalMasquees.style.height = "600px"; 
+    modalMasquees.style.width = "1000px";
+    modalMasquees.style.height = "600px";
     modalMasquees.style.border = "1px solid #FFFFFF";
     modalMasquees.style.borderRadius = "10px";
     modalMasquees.style.backgroundColor = "#000000";
@@ -46,7 +143,7 @@ function AnnoncesMasquees() {
     modalMasquees.style.position = "absolute";
     modalMasquees.style.top = "50%";
     modalMasquees.style.left = "50%";
-    modalMasquees.style.transform = "translate(-50%, -50%)"; 
+    modalMasquees.style.transform = "translate(-50%, -50%)";
     modalMasquees.style.display = "none";
     modalMasquees.style.flexWrap = "wrap";
     modalMasquees.style.justifyContent = "center";
@@ -54,14 +151,16 @@ function AnnoncesMasquees() {
     modalMasquees.style.paddingTop = "50px";
     modalMasquees.style.gap = "50px";
     modalMasquees.style.color = "#FFFFFF";
-    modalMasquees.style.overflowY = "scroll"; 
+    modalMasquees.style.overflowY = "scroll";
 
     contentDiv.appendChild(modalMasquees);
 
-    const boutonAnnoncesMasquee = document.querySelector(".AnnoncesMasquee");
-    boutonAnnoncesMasquee.addEventListener("click", async () => {
-        const data = await GetData("http://localhost:5000/api/annonces/hide", modalMasquees);
-        if (data || index < 20) {
+    const boutonAnnoncesMasquees = document.querySelector(".AnnoncesMasquee");
+    boutonAnnoncesMasquees.addEventListener("click", async () => {
+        modalMasquees.innerHTML = "";
+
+        const data = await GetData("http://localhost:5000/api/annonces/hidden", modalMasquees);
+        if (data && data.length > 0) {
             data.forEach(annonce => {
                 const annonceDiv = document.createElement("div");
                 annonceDiv.classList.add("annonce");
@@ -87,124 +186,78 @@ function AnnoncesMasquees() {
                 annonceDiv.appendChild(img);
 
                 const restoreButton = document.createElement("button");
-                restoreButton.textContent = "Restaurer";
-                restoreButton.style.backgroundColor = "#4CAF50";
-                restoreButton.style.color = "#fff";
-                restoreButton.style.border = "none";
-                restoreButton.style.padding = "10px";
-                restoreButton.style.cursor = "pointer";
-                restoreButton.style.borderRadius = "5px";
+                restoreButton.innerText = "Restaurer";
+                restoreButton.classList.add("restore-btn");
                 restoreButton.style.position = "absolute";
-                restoreButton.style.top = "10px";
+                restoreButton.style.bottom = "10px";
                 restoreButton.style.right = "10px";
-                restoreButton.style.zIndex = "1";
+                restoreButton.style.padding = "10px 20px";
+                restoreButton.style.backgroundColor = "#00FF00";
+                restoreButton.style.color = "#ffffff";
+                restoreButton.style.border = "none";
+                restoreButton.style.borderRadius = "4px";
+                restoreButton.style.cursor = "pointer";
 
                 restoreButton.addEventListener("click", () => {
-                    fetch(`http://localhost:5000/api/annonces/show`, {
+                    fetch("http://localhost:5000/api/annonces/show", {
                         method: "PUT",
                         headers: {
                             "Content-Type": "application/json"
                         },
-                        body: JSON.stringify({
-                            id: annonce._id,
-                            toDisplay: true
-                        })
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            modalMasquees.removeChild(annonceDiv);
-                        } else {
-                            console.error("Erreur lors de la restauration de l'annonce.");
-                        }
-                    })
-                    .catch(error => console.error("Erreur lors de la requête:", error));
+                        body: JSON.stringify({ id: annonce._id })
+                    }).then(() => {
+                        annonceDiv.remove();
+                    });
                 });
 
                 annonceDiv.appendChild(restoreButton);
-
-                const textContainer = document.createElement("div");
-                textContainer.style.padding = "15px";
-
-                const priceAndRestoreContainer = document.createElement("div");
-                priceAndRestoreContainer.style.display = "flex";
-                priceAndRestoreContainer.style.justifyContent = "space-between";
-                priceAndRestoreContainer.style.alignItems = "center";
-
-                const prix = document.createElement("h2");
-                prix.textContent = annonce.Prix;
-                prix.style.margin = "0";
-                prix.style.fontSize = "22px";
-                prix.style.fontWeight = "bold";
-                priceAndRestoreContainer.appendChild(prix);
-
-                textContainer.appendChild(priceAndRestoreContainer);
-
-                const title = document.createElement("h3");
-                title.textContent = annonce.Titre;
-                title.style.margin = "10px 0";
-                title.style.fontSize = "18px";
-                textContainer.appendChild(title);
-
-                const description = document.createElement("p");
-                description.textContent = annonce.Description;
-                description.style.margin = "10px 0";
-                description.style.fontSize = "14px";
-                description.style.color = "#555";
-                textContainer.appendChild(description);
-
-                annonceDiv.appendChild(textContainer);
-
-                const link = document.createElement("a");
-                link.href = annonce.LienAnnonce;
-                link.target = "_blank";
-                link.textContent = "Voir l'annonce";
-                link.style.textAlign = "center";
-                link.style.marginTop = "auto";
-                link.style.padding = "15px 0";
-                link.style.fontWeight = "bold";
-                link.style.backgroundColor = "#f1f1f1";
-                link.style.borderTop = "1px solid #ddd";
-                annonceDiv.appendChild(link);
-
                 modalMasquees.appendChild(annonceDiv);
             });
-        }
+        } 
+
         modalMasquees.style.display = "flex";
     });
 }
 
-
+// Fonction pour afficher les annonces listées
+// Fonction pour afficher les annonces listées
 function AnnoncesListees() {
     const contentDiv = document.querySelector(".ToolsBar");
-    const modalListees = document.createElement("div");
+    const modalList = document.createElement("div");
 
-    // Style de la modale pour les annonces listées
-    modalListees.style.width = "1000px"; 
-    modalListees.style.height = "600px"; 
-    modalListees.style.border = "1px solid #FFFFFF";
-    modalListees.style.borderRadius = "10px";
-    modalListees.style.backgroundColor = "#000000";
-    modalListees.style.zIndex = "10";
-    modalListees.style.position = "absolute";
-    modalListees.style.top = "50%";
-    modalListees.style.left = "50%";
-    modalListees.style.transform = "translate(-50%, -50%)";
-    modalListees.style.display = "none"; 
-    modalListees.style.flexWrap = "wrap";
-    modalListees.style.justifyContent = "center";
-    modalListees.style.alignItems = "center";
-    modalListees.style.paddingTop = "50px";
-    modalListees.style.gap = "50px";
-    modalListees.style.color = "#FFFFFF";
-    modalListees.style.overflowY = "scroll"; 
+    // Styles de la modale (inchangés)
+    modalList.style.width = "1000px";
+    modalList.style.height = "600px";
+    modalList.style.border = "1px solid #FFFFFF";
+    modalList.style.borderRadius = "10px";
+    modalList.style.backgroundColor = "#000000";
+    modalList.style.zIndex = "10";
+    modalList.style.position = "absolute";
+    modalList.style.top = "50%";
+    modalList.style.left = "50%";
+    modalList.style.transform = "translate(-50%, -50%)";
+    modalList.style.display = "none";
+    modalList.style.flexWrap = "wrap";
+    modalList.style.justifyContent = "center";
+    modalList.style.alignItems = "center";
+    modalList.style.paddingTop = "50px";
+    modalList.style.gap = "50px";
+    modalList.style.color = "#FFFFFF";
+    modalList.style.overflowY = "scroll";
 
-    contentDiv.appendChild(modalListees);
+    contentDiv.appendChild(modalList);
 
-    const boutonAnnoncesListees = document.querySelector(".AnnoncesListe");
-    boutonAnnoncesListees.addEventListener("click", async () => {
-        const data = await GetData("http://localhost:5000/api/annonces/listed", modalListees);
+    let annoncesRetirees = JSON.parse(localStorage.getItem("annoncesRetirees")) || [];
+
+    const boutonAnnoncesList = document.querySelector(".AnnoncesListe");
+    boutonAnnoncesList.addEventListener("click", async () => {
+        modalList.innerHTML = "";
+
+        const data = await GetData("http://localhost:5000/api/annonces/listed", modalList, true);
         if (data) {
-            data.forEach(annonce => {
+            const annoncesFiltrees = data.filter(annonce => !annoncesRetirees.includes(annonce._id));
+
+            annoncesFiltrees.forEach(annonce => {
                 const annonceDiv = document.createElement("div");
                 annonceDiv.classList.add("annonce");
                 annonceDiv.style.backgroundColor = "#000000";
@@ -220,79 +273,55 @@ function AnnoncesListees() {
                 annonceDiv.style.cursor = "pointer";
                 annonceDiv.style.position = "relative";
 
-                // Ajouter l'image
                 const img = document.createElement("img");
-                img.src = annonce.Image;
-                img.alt = annonce.Titre;
+                img.src = annonce.image; // Corrigez le nom du champ
+                img.alt = annonce.title; // Corrigez le nom du champ
                 img.style.width = "100%";
                 img.style.height = "300px";
                 img.style.objectFit = "cover";
                 annonceDiv.appendChild(img);
+                
+                const removeButton = document.createElement("button");
+                removeButton.innerText = "Retirer";
+                removeButton.classList.add("remove-btn");
+                removeButton.style.position = "absolute";
+                removeButton.style.bottom = "10px";
+                removeButton.style.right = "10px";
+                removeButton.style.padding = "10px 20px";
+                removeButton.style.backgroundColor = "#ff0000";
+                removeButton.style.color = "#ffffff";
+                removeButton.style.border = "none";
+                removeButton.style.borderRadius = "4px";
+                removeButton.style.cursor = "pointer";
 
-                // Conteneur pour le texte
-                const textContainer = document.createElement("div");
-                textContainer.style.padding = "15px";
+                removeButton.addEventListener("click", async () => {
+                    annoncesRetirees.push(annonce._id);
+                    localStorage.setItem("annoncesRetirees", JSON.stringify(annoncesRetirees));
 
-                const priceAndRestoreContainer = document.createElement("div");
-                priceAndRestoreContainer.style.display = "flex";
-                priceAndRestoreContainer.style.justifyContent = "space-between";
-                priceAndRestoreContainer.style.alignItems = "center";
+                    // Faire la requête DELETE pour retirer l'annonce du serveur
+                    await fetch("http://localhost:5000/api/annonces/listed", {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ id: annonce._id })
+                    });
 
-                const prix = document.createElement("h2");
-                prix.textContent = annonce.Prix;
-                prix.style.margin = "0";
-                prix.style.fontSize = "22px";
-                prix.style.fontWeight = "bold";
-                priceAndRestoreContainer.appendChild(prix);
-
-                textContainer.appendChild(priceAndRestoreContainer);
-
-                const title = document.createElement("h3");
-                title.textContent = annonce.Titre;
-                title.style.margin = "10px 0";
-                title.style.fontSize = "18px";
-                textContainer.appendChild(title);
-
-                const description = document.createElement("p");
-                description.textContent = annonce.Description;
-                description.style.margin = "10px 0";
-                description.style.fontSize = "14px";
-                description.style.color = "#555";
-                textContainer.appendChild(description);
-
-                annonceDiv.appendChild(textContainer);
-
-                const link = document.createElement("a");
-                link.href = annonce.LienAnnonce;
-                link.target = "_blank";
-                link.textContent = "Voir l'annonce";
-                link.style.textAlign = "center";
-                link.style.marginTop = "auto";
-                link.style.padding = "15px 0";
-                link.style.fontWeight = "bold";
-                link.style.backgroundColor = "#f1f1f1";
-                link.style.borderTop = "1px solid #ddd";
-                annonceDiv.appendChild(link);
-
-                // Hover effect
-                annonceDiv.addEventListener("mouseover", () => {
-                    annonceDiv.style.transform = "scale(1.05)";
-                    annonceDiv.style.boxShadow = "0 6px 10px rgba(0, 0, 0, 0.15)";
+                    annonceDiv.remove();
                 });
 
-                annonceDiv.addEventListener("mouseout", () => {
-                    annonceDiv.style.transform = "scale(1)";
-                    annonceDiv.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
-                });
-
-                modalListees.appendChild(annonceDiv);
+                annonceDiv.appendChild(removeButton);
+                modalList.appendChild(annonceDiv);
             });
         }
-        modalListees.style.display = "flex";
+        modalList.style.display = "flex";
+        
     });
 }
 
+
+
 function gestionAnnonces() {
-    AnnoncesMasquees();  // Gérer les annonces masquées
-    AnnoncesListees();   // Gérer les annonces listées
+    AnnoncesMasquees();
+    AnnoncesListees();
 }

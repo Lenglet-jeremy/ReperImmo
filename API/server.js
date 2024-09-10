@@ -4,8 +4,7 @@ const cors = require('cors');
 require("dotenv").config();
 const app = express();
 const AnnoncesGlobale = require('./models/AnnoncesGlobale');
-const ListedAnnonces = [];  // On va utiliser un tableau en mémoire pour stocker temporairement les annonces sélectionnées
-
+const ListedAnnonces = require('./models/ListedAnnonces');  // Importer le modèle pour les annonces listées
 
 // Middleware pour permettre les requêtes cross-origin (depuis un autre domaine)
 app.use(cors());
@@ -17,25 +16,27 @@ mongoose.connect(process.env.MONGO_URI, process.env.MONGO_OPTIONS)
     .catch(err => console.error('Could not connect to MongoDB:', err));
 
 
-
-
 // Route pour récupérer les annonces listées
-app.get('/api/annonces/listed', (req, res) => {
+app.get('/api/annonces/listed', async (req, res) => {
     try {
-        // Renvoie les annonces sélectionnées
-        res.json(ListedAnnonces);
+        const annonces = await ListedAnnonces.find();
+        console.log("Annonces listées:", annonces);  // Ajouter ce log
+        res.json(annonces);
     } catch (err) {
+        console.error("Erreur lors de la récupération des annonces listées:", err);
         res.status(500).json({ message: err.message });
     }
 });
 
+
+// Route pour ajouter une annonce à la liste des annonces listées
 // Route pour ajouter une annonce à la liste des annonces listées
 app.post('/api/annonces/listed', async (req, res) => {
     try {
         const { id } = req.body;
 
         // Vérifier si l'annonce est déjà dans la liste
-        const annonceExistante = ListedAnnonces.find(annonce => annonce._id === id);
+        const annonceExistante = await ListedAnnonces.findOne({ _id: id });
         if (annonceExistante) {
             return res.status(400).json({ message: "L'annonce est déjà listée." });
         }
@@ -46,8 +47,14 @@ app.post('/api/annonces/listed', async (req, res) => {
             return res.status(404).json({ message: "Annonce non trouvée." });
         }
 
-        // Ajouter l'annonce à la liste des annonces sélectionnées
-        ListedAnnonces.push(annonce);
+        // Créer une nouvelle annonce dans la collection ListedAnnonces
+        const newAnnonce = new ListedAnnonces({
+            title: annonce.Titre,   // Utilisez les bons noms de champs
+            image: annonce.Image
+            // Ajoutez d'autres champs nécessaires ici
+        });
+
+        await newAnnonce.save();
 
         res.status(201).json({ message: "Annonce ajoutée avec succès." });
     } catch (err) {
@@ -55,6 +62,22 @@ app.post('/api/annonces/listed', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
+
+
+// Route pour retirer une annonce de la liste des annonces listées
+app.delete('/api/annonces/listed', async (req, res) => {
+    try {
+        const { id } = req.body;
+        await ListedAnnonces.findByIdAndDelete(id);
+        res.json({ message: "Annonce retirée avec succès." });
+    } catch (err) {
+        console.error("Erreur lors du retrait de l'annonce:", err);
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Routes restantes inchangées...
+
 
 // Route pour associer une catégorie à une annonce
 app.post('/api/annonces/category', async (req, res) => {
@@ -103,17 +126,16 @@ app.put('/api/annonces/hide', async (req, res) => {
 });
 
 // Route pour récupérer les annonces cachées
-app.get('/api/annonces/hide', async (req, res) => {
+app.get('/api/annonces/hidden', async (req, res) => {
     try {
         let annoncesCachees = await AnnoncesGlobale.find({ toDisplay: false });
-        
-        console.log('Annonces cachées récupérées:', annoncesCachees);
         res.json(annoncesCachees);
     } catch (err) {
         console.error('Erreur lors de la récupération des annonces cachées:', err);
         res.status(500).json({ message: err.message });
     }
 });
+
 
 // Route pour réafficher une annonce masquée
 app.put('/api/annonces/show', async (req, res) => {

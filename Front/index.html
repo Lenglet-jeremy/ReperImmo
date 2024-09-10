@@ -30,12 +30,13 @@
     <script src="./3.0.ToolsBar/1.0.ToolsBar.js"></script>
     <script src="./4.0.content/1.0.content.js"></script>
 
+    <script>loadAnnonces(0, 1000000000, 0, 1000000, 0, 1000)</script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             loadPartial('sidebar', './1.0.sideBar/1.0.sideBar.html');
-            loadPartial('toolsMenu', './2.0.toolsMenu/1.0.toolsMenu.html', loadAnnonces);
+            loadPartial('toolsMenu', './2.0.toolsMenu/1.0.toolsMenu.html', filtres);
             loadPartial('toolsBar', './3.0.toolsBar/1.0.toolsBar.html', gestionAnnonces);
-            loadPartial('content', './4.0.content/1.0.content.html', loadAnnonces); // Chargement des annonces après l'injection du contenu
+            loadPartial('content', './4.0.content/1.0.content.html');
         });
         
         function loadPartial(id, url, callback) {

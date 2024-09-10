@@ -1,10 +1,100 @@
-let currentPage = 1; // Définir currentPage à l'extérieur de la fonction
+function showNotification(message) {
+    const notification = document.createElement("div");
+    notification.textContent = message;
+    notification.style.position = "fixed";
+    notification.style.bottom = "20px";
+    notification.style.left = "20px";
+    notification.style.backgroundColor = "#4caf50"; // Vert pour succès
+    notification.style.color = "#fff";
+    notification.style.padding = "10px 20px";
+    notification.style.borderRadius = "5px";
+    notification.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+    notification.style.fontSize = "16px";
+    notification.style.zIndex = "1000";
+    notification.style.opacity = "0";
+    notification.style.transition = "opacity 0.3s ease-in-out";
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.style.opacity = "1";
+    }, 100);
+
+    setTimeout(() => {
+        notification.style.opacity = "0";
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 1000);
+}
+
+let minBudget = 0;
+let maxBudget = 1000000000;
+
+let minSurface = 0; 
+let maxSurface = 1000000;
 
 
+let minNbPieces = 0; 
+let maxNbPieces = 1000000;
 
-function loadAnnonces() {
-    
+function filtres() {
+    let minPriceInput = document.querySelector("#minPrice");
+    let maxPriceInput = document.querySelector("#maxPrice");
 
+
+    if (minPriceInput && maxPriceInput) {
+        minPriceInput.addEventListener("change", (e) => {
+            minBudget = parseFloat(e.target.value) || 0;
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces);
+        });
+
+        maxPriceInput.addEventListener("change", (e) => {
+            maxBudget = parseFloat(e.target.value) || 1000000000;
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces);
+        });
+    } else {
+        console.error("Champs de budget non trouvés.");
+    }
+
+
+    let minSurfaceInput = document.querySelector("#minSurface");
+    let maxSurfaceInput = document.querySelector("#maxSurface");
+
+    if (minSurfaceInput && maxSurfaceInput) {
+        minSurfaceInput.addEventListener("change", (e) => {
+            minSurface = parseFloat(e.target.value) || 0;
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces);
+        });
+
+        maxSurfaceInput.addEventListener("change", (e) => {
+            maxSurface = parseFloat(e.target.value) || 1000000;
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces);
+        });
+    } else {
+        console.error("Champs de surface non trouvés.");
+    }
+
+
+    let minNbPieceInput = document.querySelector("#minNbPiece");
+    let maxNbPieceInput = document.querySelector("#maxNbPiece");
+
+    if (minNbPieceInput && maxNbPieceInput) {
+        minNbPieceInput.addEventListener("change", (e) => {
+            minNbPieces = parseFloat(e.target.value) || 0;
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces);
+        });
+
+        maxNbPieceInput.addEventListener("change", (e) => {
+            maxNbPieces = parseFloat(e.target.value) || 1000000;
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces);
+        });
+    } else {
+        console.error("Champs de surface non trouvés.");
+    }
+}
+
+function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, SurfaceMax = 1000000, NbPiecesMin = 0, NbPiecesMax = 1000) {
     fetch(`http://localhost:5000/api/annonces`)
         .then(response => response.json())
         .then(data => {
@@ -20,7 +110,16 @@ function loadAnnonces() {
             contentDiv.style.padding = "20px";
 
             data.annonces.forEach(annonce => {
-                if (annonce.toDisplay) {
+                let prixAnnonce = parseFloat(annonce.Prix.replace('€', '').replace(/\s/g, '').trim());
+                let surfaceAnnonce = annonce.surface;
+                let nbPiecesAnnonce = annonce.nombreDePieces;
+                
+                
+                if (annonce.toDisplay && 
+                    prixAnnonce >= BudgetMin && prixAnnonce <= BudgetMax &&
+                    surfaceAnnonce >= SurfaceMin && surfaceAnnonce <= SurfaceMax &&
+                    nbPiecesAnnonce >= NbPiecesMin && nbPiecesAnnonce <= NbPiecesMax) {
+                    
                     const annonceDiv = document.createElement("div");
                     annonceDiv.classList.add("annonce");
                     annonceDiv.style.backgroundColor = "#000000";
@@ -102,19 +201,21 @@ function loadAnnonces() {
                                 "Content-Type": "application/json"
                             },
                             body: JSON.stringify({
-                                id: annonce._id
+                                id: annonce._id  // Assurez-vous de passer l'ID correct ici
                             })
                         })
                         .then(response => response.json())
                         .then(data => {
                             if (data.message) {
                                 console.log("Annonce ajoutée à la liste avec succès.");
+                                showNotification("Annonce ajoutée à la liste !");
                             } else {
                                 console.error("Erreur lors de l'ajout de l'annonce.");
                             }
                         })
                         .catch(error => console.error("Erreur lors de la requête:", error));
                     });
+                    
 
                     buttonContainer.appendChild(addButton);
 
@@ -131,10 +232,8 @@ function loadAnnonces() {
                     hideButton.style.alignItems = "center";
 
                     hideButton.addEventListener("click", () => {
-                        // Supprimer immédiatement l'annonce du DOM
                         annonceDiv.remove();
-                    
-                        // Ensuite, effectuer la requête pour cacher l'annonce côté serveur
+
                         fetch(`http://localhost:5000/api/annonces/hide`, {
                             method: "PUT",
                             headers: {
@@ -152,13 +251,10 @@ function loadAnnonces() {
                         })
                         .catch(error => console.error("Erreur lors de la requête:", error));
                     });
-                    
-                    
 
                     buttonContainer.appendChild(hideButton);
 
                     rowContainer.appendChild(buttonContainer);
-
                     textContainer.appendChild(rowContainer);
 
                     const detailsContainer = document.createElement("div");
@@ -211,50 +307,14 @@ function loadAnnonces() {
                     viewButton.style.borderTop = "1px solid #ddd";
 
                     viewButton.addEventListener("click", () => {
-                        window.location.href = `/annonce/${annonce._id}`;
+                        window.open(annonce.LienAnnonce, '_blank'); // Ouvre le lien dans un nouvel onglet
                     });
+                    
 
                     annonceDiv.appendChild(viewButton);
                     contentDiv.appendChild(annonceDiv);
                 }
             });
-
-            // Conteneur de pagination
-            const paginationDiv = document.createElement("div");
-            paginationDiv.style.display = "flex";
-            paginationDiv.style.justifyContent = "center";
-            paginationDiv.style.position = "absolute";
-            paginationDiv.style.bottom = "20px";
-            paginationDiv.style.left = "0";
-            paginationDiv.style.right = "0";
-            paginationDiv.style.gap = "10px";
-
-            const buttonWrapper = document.createElement("div");
-            buttonWrapper.style.display = "flex";
-            buttonWrapper.style.justifyContent = "space-between";
-            buttonWrapper.style.width = "200px"; // Largeur fixe pour éviter le décalage
-
-            // const prevButton = document.createElement("button");
-            // prevButton.textContent = "Précédent";
-            // prevButton.disabled = data.currentPage === 1; // Désactiver le bouton "Précédent" si on est sur la première page
-            // prevButton.addEventListener("click", () => {
-            //     currentPage--;
-            //     loadAnnonces(currentPage);
-            // });
-            // buttonWrapper.appendChild(prevButton);
-
-            // const nextButton = document.createElement("button");
-            // nextButton.textContent = "Suivant";
-            // nextButton.disabled = data.currentPage === data.totalPages; // Désactiver si on est sur la dernière page
-            // nextButton.addEventListener("click", () => {
-            //     currentPage++;
-            //     loadAnnonces(currentPage);
-            // });
-            // buttonWrapper.appendChild(nextButton);
-
-            paginationDiv.appendChild(buttonWrapper);
-            contentDiv.appendChild(paginationDiv);
         })
         .catch(error => console.error("Erreur lors du chargement des annonces:", error));
 }
-
