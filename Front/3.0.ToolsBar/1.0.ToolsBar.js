@@ -46,9 +46,140 @@ function createSubTabs(tabContainer) {
     return subTabContainer;
 }
 
-// Modification de la fonction pour créer des onglets avec sous-onglets
+function createTabsAndCloseButton(container, contentContainer) {
+    // Création du conteneur des onglets
+    const tabContainer = document.createElement("div");
+    tabContainer.classList.add("TabContainer")
+    tabContainer.style.display = "flex";
+    tabContainer.style.alignItems = "center";
+    tabContainer.style.justifyContent = "space-between";
+    tabContainer.style.height = "50px";
+    tabContainer.style.borderBottom = "1px solid #FFFFFF";
+    tabContainer.style.padding = "0px 10px";
+    tabContainer.style.overflowX = "scroll";
+    tabContainer.style.backgroundColor = "#222"; // Arrière-plan sombre pour les onglets
+
+    const tabsWrapper = document.createElement("div");
+    tabsWrapper.style.display = "flex";
+    tabsWrapper.style.flexGrow = "1";
+
+    const addTabButton = document.createElement("button");
+    addTabButton.innerText = "+ Ajouter onglet";
+    addTabButton.style.padding = "5px 10px";
+    addTabButton.style.marginLeft = "auto";
+    addTabButton.style.border = "none";
+    addTabButton.style.backgroundColor = "#f0f0f0";
+    addTabButton.style.cursor = "pointer";
+    addTabButton.addEventListener("click", () => {
+        createTab(tabsWrapper, contentContainer, "Nouvel onglet");
+    });
+
+    // Bouton de fermeture
+    const closeButton = document.createElement("span");
+    closeButton.style.cursor = "pointer";
+    closeButton.style.color = "#FFFFFF";
+    closeButton.innerHTML = "&times;";
+    closeButton.style.fontSize = "24px";
+    closeButton.style.marginLeft = "10px";
+    closeButton.addEventListener("click", () => {
+        container.style.display = "none"; // Fermer la modale
+    });
+
+    tabContainer.appendChild(tabsWrapper);
+    tabContainer.appendChild(addTabButton);
+    tabContainer.appendChild(closeButton);
+    container.appendChild(tabContainer);
+
+    // Charger les onglets sauvegardés
+    loadTabsFromLocalStorage(tabsWrapper, contentContainer);
+}
+
+function createTab(tabsWrapper, contentContainer, tabName) {
+    const tab = document.createElement("div");
+    tab.style.padding = "10px";
+    tab.style.marginRight = "10px";
+    tab.style.backgroundColor = "#000000";
+    tab.style.color = "#FFFFFF";
+    tab.style.cursor = "pointer";
+    tab.style.border = "1px solid #ccc";
+    tab.style.borderRadius = "4px";
+    
+    const tabContent = document.createElement("span");
+    tabContent.innerText = tabName;
+    tab.appendChild(tabContent);
+
+    // Double-clic pour renommer l'onglet (ceci affecte uniquement l'onglet, pas le contenu associé)
+    tabContent.addEventListener("dblclick", () => {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = tabContent.innerText;
+        input.style.width = "100px"; // Largeur du champ de texte
+        tab.replaceChild(input, tabContent);
+
+        // Sauvegarde du nouveau nom de l'onglet après édition
+        const saveTabName = () => {
+            tabContent.innerText = input.value;
+            tab.replaceChild(tabContent, input);
+            saveTabsToLocalStorage(); // Sauvegarde dans localStorage
+        };
+
+        input.addEventListener("blur", saveTabName);
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                saveTabName();
+            }
+        });
+
+        input.focus();
+    });
+
+    // Gestion de la fermeture de l'onglet
+    const closeButton = document.createElement("span");
+    closeButton.innerHTML = "&times;";
+    closeButton.style.cursor = "pointer";
+    closeButton.style.marginLeft = "10px";
+    closeButton.addEventListener("click", () => {
+        tabsWrapper.removeChild(tab);
+        saveTabsToLocalStorage(tabsWrapper);  // Sauvegarder après la suppression
+    });
+
+    tab.appendChild(closeButton);
+    tabsWrapper.appendChild(tab);
+
+    // Gestion de l'affichage du contenu lié à l'onglet (le nom ici ne change pas lorsque l'onglet est renommé)
+    tab.addEventListener("click", () => {
+        contentContainer.innerHTML = ''; 
+        const contentDiv = document.createElement("div");
+        contentDiv.style.padding = "20px";
+        contentDiv.style.color = "#ffffff";
+        contentDiv.style.backgroundColor = "#333";
+        contentDiv.innerText = `Contenu de l'onglet ${tabName}`; // On utilise le nom initial ici
+        contentContainer.appendChild(contentDiv);
+    });
+
+    saveTabsToLocalStorage(tabsWrapper);  // Sauvegarder les onglets dans le localStorage
+}
+
+
+
+function saveTabsToLocalStorage(tabsWrapper) {
+    const tabNames = Array.from(tabsWrapper.children).map(tab => tab.querySelector('span').innerText.trim());
+    localStorage.setItem('tabs', JSON.stringify(tabNames));
+}
+
+function loadTabsFromLocalStorage(tabsWrapper, contentContainer) {
+    const savedTabs = JSON.parse(localStorage.getItem('tabs'));
+    if (savedTabs && savedTabs.length > 0) {
+        savedTabs.forEach(tabName => createTab(tabsWrapper, contentContainer, tabName));
+    } else {
+        // Si aucun onglet n'est sauvegardé, créer un onglet par défaut
+        createTab(tabsWrapper, contentContainer, "Onglet par défaut");
+    }
+}
+
 function createTabs(container) {
     const tabContainer = document.createElement("div");
+    tabContainer.classList.add("TabContainer")
     tabContainer.style.display = "flex";
     tabContainer.style.flexGrow = "1";
     tabContainer.style.position = "fixed";
@@ -63,24 +194,16 @@ function createTabs(container) {
     tabsWrapper.style.display = "flex";
 
     const contentContainer = document.createElement("div"); // Sous-conteneur pour le contenu des onglets
+    contentContainer.classList.add("ContentContainer")
     contentContainer.style.flexGrow = "1";
-    contentContainer.style.padding = "20px";
+    contentContainer.style.width = "100%";
+    contentContainer.style.height = "100%";
     contentContainer.style.color = "#ffffff";
     contentContainer.style.backgroundColor = "#333";
-    contentContainer.style.marginTop = "60px"; // Ajustez la marge si nécessaire
 
     const saveTabsToLocalStorage = () => {
         const tabTexts = Array.from(tabsWrapper.children).map(tab => tab.querySelector('span').innerText);
         localStorage.setItem('tabs', JSON.stringify(tabTexts));
-    };
-
-    const loadTabsFromLocalStorage = () => {
-        const savedTabs = JSON.parse(localStorage.getItem('tabs'));
-        if (savedTabs && savedTabs.length > 0) {
-            savedTabs.forEach(tabText => createTab(tabText));
-        } else {
-            createTab("Annonces listées");
-        }
     };
 
     const createTab = (text = "Annonces listées") => {
@@ -127,8 +250,11 @@ function createTabs(container) {
             contentContainer.innerHTML = ''; 
     
             const contentDiv = document.createElement("div");
-            contentDiv.style.padding = "20px";
             contentDiv.style.color = "#ffffff";
+            contentDiv.style.display = "flex";
+            contentDiv.style.flexGrow = "1";
+            contentDiv.style.width = "100%";
+            contentDiv.style.height = "100%";
             contentDiv.style.backgroundColor = "#333";
             contentDiv.innerText = `Contenu de l'onglet ${tabContent.innerText}`;
     
@@ -315,11 +441,13 @@ function AnnoncesMasquees() {
     });
 }
 
+
 function AnnoncesListees() {
     const contentDiv = document.querySelector(".ToolsBar");
-    const modalList = document.createElement("div");
 
-    // Styles de la modale (inchangés)
+    // Créer la modale globale
+    const modalList = document.createElement("div");
+    modalList.classList.add("modal-global");
     modalList.style.width = "1000px";
     modalList.style.height = "600px";
     modalList.style.border = "1px solid #FFFFFF";
@@ -331,85 +459,28 @@ function AnnoncesListees() {
     modalList.style.left = "50%";
     modalList.style.transform = "translate(-50%, -50%)";
     modalList.style.display = "none";
-    modalList.style.flexWrap = "wrap";
-    modalList.style.justifyContent = "center";
-    modalList.style.alignItems = "center";
-    modalList.style.paddingTop = "50px";
-    modalList.style.gap = "50px";
-    modalList.style.color = "#FFFFFF";
-    modalList.style.overflowY = "scroll";
+    modalList.style.flexDirection = "column";  // Organiser le contenu verticalement
 
+    // Créer le conteneur pour le contenu des onglets
+    const contentContainer = document.createElement("div");
+    contentContainer.classList.add("ContentContainer")
+    contentContainer.style.overflowY = "scroll";
+    contentContainer.style.color = "#FFFFFF";
+    contentContainer.style.backgroundColor = "#000000";  // Arrière-plan noir pour le contenu
+
+    // Ajouter les onglets et le bouton de fermeture dans la modale
+    createTabsAndCloseButton(modalList, contentContainer);
+
+    // Ajouter la div du contenu dans la modale
+    modalList.appendChild(contentContainer);
+
+    // Ajouter la modale dans le conteneur principal
     contentDiv.appendChild(modalList);
 
-    let annoncesRetirees = JSON.parse(localStorage.getItem("annoncesRetirees")) || [];
-
+    // Gérer l'affichage de la modale lorsque le bouton est cliqué
     const boutonAnnoncesList = document.querySelector(".AnnoncesListe");
-    boutonAnnoncesList.addEventListener("click", async () => {
-        modalList.innerHTML = "";
-
-        const data = await GetData("http://localhost:5000/api/annonces/listed", modalList, true);
-        if (data) {
-            const annoncesFiltrees = data.filter(annonce => !annoncesRetirees.includes(annonce._id));
-
-            annoncesFiltrees.forEach(annonce => {
-                const annonceDiv = document.createElement("div");
-                annonceDiv.classList.add("annonce");
-                annonceDiv.style.backgroundColor = "#000000";
-                annonceDiv.style.display = "flex";
-                annonceDiv.style.flexDirection = "column";
-                annonceDiv.style.border = "1px solid #ddd";
-                annonceDiv.style.borderRadius = "8px";
-                annonceDiv.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
-                annonceDiv.style.width = "400px";
-                annonceDiv.style.height = "400px";
-                annonceDiv.style.overflow = "hidden";
-                annonceDiv.style.transition = "transform 0.2s ease-in-out";
-                annonceDiv.style.cursor = "pointer";
-                annonceDiv.style.position = "relative";
-
-                const img = document.createElement("img");
-                img.src = annonce.image; // Corrigez le nom du champ
-                img.alt = annonce.title; // Corrigez le nom du champ
-                img.style.width = "100%";
-                img.style.height = "200px";
-                img.style.objectFit = "cover";
-                annonceDiv.appendChild(img);
-                
-                const removeButton = document.createElement("button");
-                removeButton.innerText = "Retirer";
-                removeButton.classList.add("remove-btn");
-                removeButton.style.position = "absolute";
-                removeButton.style.bottom = "10px";
-                removeButton.style.right = "10px";
-                removeButton.style.padding = "10px 20px";
-                removeButton.style.backgroundColor = "#ff0000";
-                removeButton.style.color = "#ffffff";
-                removeButton.style.border = "none";
-                removeButton.style.borderRadius = "4px";
-                removeButton.style.cursor = "pointer";
-
-                removeButton.addEventListener("click", async () => {
-                    annoncesRetirees.push(annonce._id);
-                    localStorage.setItem("annoncesRetirees", JSON.stringify(annoncesRetirees));
-
-                    // Faire la requête DELETE pour retirer l'annonce du serveur
-                    await fetch("http://localhost:5000/api/annonces/listed", {
-                        method: "DELETE",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ id: annonce._id })
-                    });
-
-                    annonceDiv.remove();
-                });
-
-                annonceDiv.appendChild(removeButton);
-                modalList.appendChild(annonceDiv);
-            });
-        }
+    boutonAnnoncesList.addEventListener("click", () => {
         modalList.style.display = "flex";
-        
     });
 }
 

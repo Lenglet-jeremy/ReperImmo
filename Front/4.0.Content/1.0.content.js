@@ -266,28 +266,8 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                     addButton.style.borderRadius = "15px";
                     addButton.style.display = "flex";
                     addButton.style.justifyContent = "center";
-
-                    addButton.addEventListener("click", () => {
-                        fetch("http://localhost:5000/api/annonces/listed", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                id: annonce._id  // Assurez-vous de passer l'ID correct ici
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.message) {
-                                console.log("Annonce ajoutée à la liste avec succès.");
-                                showNotification("Annonce ajoutée à la liste !");
-                            } else {
-                                console.error("Erreur lors de l'ajout de l'annonce.");
-                            }
-                        })
-                        .catch(error => console.error("Erreur lors de la requête:", error));
-                    });
+                    
+                    
                     
 
                     buttonContainer.appendChild(addButton);
