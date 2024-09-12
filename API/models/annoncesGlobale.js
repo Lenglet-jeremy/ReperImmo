@@ -5,7 +5,7 @@ const Annonces = new mongoose.Schema({
     LienAnnonce: { type: String, default: "" },
     Prix: { type: String, default: "" },
     Image: { type: String, default: "" },
-    PrixAuMCarre: { type: String, default: "" },
+    PrixAuMCarre: { type: Number, default: "" },
     TypeDeBien: { type: String, default: "" },
     toDisplay: { type: Boolean, default: true }, 
 }, { collection: 'Rennes' });

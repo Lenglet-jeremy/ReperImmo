@@ -39,7 +39,6 @@ let maxNbPieces = 1000000;
 // Tableau pour stocker les catégories sélectionnées
 let selectedCategories = [];
 
-// Fonction pour gérer les catégories sélectionnées
 function updateSelectedCategories() {
     selectedCategories = []; // Vider le tableau à chaque mise à jour
 
@@ -102,12 +101,73 @@ function filtres() {
     document.querySelectorAll("input[name='category']").forEach((checkbox) => {
         checkbox.addEventListener("change", updateSelectedCategories); // Mise à jour des catégories à chaque changement
     });
+
+    document.querySelector("#sortOrder").addEventListener("change", (event) => {
+        const selectedSortOrder = event.target.value;
+        loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories, selectedSortOrder);
+    });
+    
+    
 }
 
-function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, SurfaceMax = 1000000, NbPiecesMin = 0, NbPiecesMax = 1000, categories = []) {
+function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, SurfaceMax = 1000000, NbPiecesMin = 0, NbPiecesMax = 1000, categories = [], sortOrder = 'asc') {
     fetch(`http://localhost:5000/api/annonces`)
         .then(response => response.json())
         .then(data => {
+            // Filtrer les annonces en fonction des critères
+            let filteredAnnonces = data.annonces.filter(annonce => {
+                let prixAnnonce = parseFloat(annonce.Prix.replace(/[^\d.-]/g, '')); // Extraction des prix numériques
+                let surfaceAnnonce = annonce.Surface;
+                let nbPiecesAnnonce = annonce.NombreDePieces;
+
+                let firstWord = annonce.TypeDeBien.split(" ")[0]; // Extraction du premier mot de "TypeDeBien"
+                
+                return annonce.toDisplay &&
+                    prixAnnonce >= BudgetMin && prixAnnonce <= BudgetMax &&
+                    surfaceAnnonce >= SurfaceMin && surfaceAnnonce <= SurfaceMax &&
+                    nbPiecesAnnonce >= NbPiecesMin && nbPiecesAnnonce <= NbPiecesMax &&
+                    (categories.length === 0 || categories.includes(firstWord));
+            });
+
+            // Appliquer le tri en fonction de la sélection de l'utilisateur
+            // Appliquer le tri en fonction de la sélection de l'utilisateur
+            if (sortOrder === "PrixCroissant") {
+                filteredAnnonces.sort((a, b) => {
+                    let prixA = parseFloat(a.Prix.replace(/[^\d.-]/g, ''));
+                    let prixB = parseFloat(b.Prix.replace(/[^\d.-]/g, ''));
+                    return prixA - prixB;
+                });
+            } else if (sortOrder === "PrixDecroissant") {
+                filteredAnnonces.sort((a, b) => {
+                    let prixA = parseFloat(a.Prix.replace(/[^\d.-]/g, ''));
+                    let prixB = parseFloat(b.Prix.replace(/[^\d.-]/g, ''));
+                    return prixB - prixA;
+                });
+            } else if (sortOrder === "SurfaceCroissante") {
+                filteredAnnonces.sort((a, b) => a.Surface - b.Surface);
+            } else if (sortOrder === "SurfaceDecroissante") {
+                filteredAnnonces.sort((a, b) => b.Surface - a.Surface);
+            } else if (sortOrder === "PrixMCarreCroissant") {
+                filteredAnnonces.sort((a, b) => {
+                    let prixM2A = a.scjvemr ? parseFloat(a.scjvemr.replace(/[^\d.-]/g, '')) : 0;
+                    let prixM2B = b.scjvemr ? parseFloat(b.scjvemr.replace(/[^\d.-]/g, '')) : 0;
+                    return prixM2A - prixM2B;
+                });
+            } else if (sortOrder === "PrixMCarreDecroissant") {
+                filteredAnnonces.sort((a, b) => {
+                    let prixM2A = a.scjvemr ? parseFloat(a.scjvemr.replace(/[^\d.-]/g, '')) : 0;
+                    let prixM2B = b.scjvemr ? parseFloat(b.scjvemr.replace(/[^\d.-]/g, '')) : 0;
+                    return prixM2B - prixM2A;
+                });
+            } else if (sortOrder === "DatesAnciennes" || sortOrder === "DatesRecentes") {
+                filteredAnnonces.sort((a, b) => {
+                    const dateA = new Date(a.DateAjoutReperimmo);
+                    const dateB = new Date(b.DateAjoutReperimmo);
+                    return sortOrder === "DatesAnciennes" ? dateA - dateB : dateB - dateA;
+                });
+            }
+
+            // Rendu des annonces (le reste du code pour l'affichage des annonces reste identique)
             const contentDiv = document.querySelector(".Content");
             contentDiv.innerHTML = "";
             contentDiv.style.display = "flex";
@@ -117,31 +177,28 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
             contentDiv.style.overflowY = "scroll";
             contentDiv.style.height = "calc(100vh - 99px)";
             contentDiv.style.gap = "20px";
-            contentDiv.style.padding = "20px";
+            contentDiv.style.padding = "20px"
 
-            data.annonces.forEach(annonce => {
+            filteredAnnonces.forEach(annonce => {
                 let prixAnnonce = annonce.Prix;
+                // POURQUOI ANNONCE.scjvemr = PRIX AU M² ?????????===========================================
+                let prixAuMCarre = annonce.scjvemr ? parseFloat(annonce.scjvemr.replace(/[^\d.-]/g, '')) : 0;
                 if (typeof prixAnnonce === 'string') {
-                    prixAnnonce = parseFloat(prixAnnonce.replace(/[^\d.-]/g, '')); // Retirer tout sauf les chiffres, les points et les tirets
+                    prixAnnonce = parseFloat(prixAnnonce.replace(/[^\d.-]/g, ''));
                 }
-
 
                 let surfaceAnnonce = annonce.Surface;
                 let nbPiecesAnnonce = annonce.NombreDePieces;
 
-                // Extraire le premier mot de TypeDeBien
                 let firstWord = annonce.TypeDeBien.split(" ")[0]; 
-                console.log(firstWord);
-                
 
-
-                // Vérifiez si l'annonce correspond à une des catégories sélectionnées
+                // Vérification des conditions pour l'affichage des annonces
                 if (annonce.toDisplay &&
                     prixAnnonce >= BudgetMin && prixAnnonce <= BudgetMax &&
                     surfaceAnnonce >= SurfaceMin && surfaceAnnonce <= SurfaceMax &&
                     nbPiecesAnnonce >= NbPiecesMin && nbPiecesAnnonce <= NbPiecesMax &&
-                    (categories.length === 0 || categories.includes(firstWord))) { // Utiliser le premier mot pour le filtre
-                        
+                    (categories.length === 0 || categories.includes(firstWord))) {
+
                     const annonceDiv = document.createElement("div");
                     annonceDiv.classList.add("annonce");
                     annonceDiv.style.backgroundColor = "#000000";
@@ -181,21 +238,16 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                     priceContainer.style.alignItems = "center";
 
                     const prix = document.createElement("h2");
-                    prix.textContent = annonce.Prix;
+                    prix.textContent = `${prixAnnonce.toLocaleString()} €`; 
                     prix.style.margin = "0";
                     prix.style.fontSize = "22px";
                     prix.style.fontWeight = "bold";
                     priceContainer.appendChild(prix);
 
-                    if (annonce.PrixAuMCarre) {
-                        const prixMCarre = document.createElement("p");
-                        prixMCarre.textContent = `${annonce.PrixAuMCarre}`;
-                        prixMCarre.style.margin = "0";
-                        prixMCarre.style.fontSize = "14px";
-                        prixMCarre.style.color = "#333";
-                        prixMCarre.style.marginLeft = "10px";
-                        priceContainer.appendChild(prixMCarre);
-                    }
+                    const prixAuMCarreDiv = document.createElement("div");
+                    prixAuMCarreDiv.className = "prix-au-m-carre";
+                    prixAuMCarreDiv.innerText = prixAuMCarre > 0 ? `${prixAuMCarre} €/m²` : `Non renseigné`;
+                    priceContainer.appendChild(prixAuMCarreDiv);
 
                     rowContainer.appendChild(priceContainer);
 
@@ -214,7 +266,6 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                     addButton.style.borderRadius = "15px";
                     addButton.style.display = "flex";
                     addButton.style.justifyContent = "center";
-                    addButton.style.alignItems = "center";
 
                     addButton.addEventListener("click", () => {
                         fetch("http://localhost:5000/api/annonces/listed", {
@@ -335,18 +386,18 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
 
                     annonceDiv.appendChild(viewButton);
                     // Affichage de l'ID de l'annonce en bas à gauche
-                    const idContainer = document.createElement("div");
-                    idContainer.textContent = `${annonce._id}`;  // Assurez-vous que l'ID de l'annonce est correct
-                    idContainer.style.position = "absolute";
-                    idContainer.style.bottom = "60px";
-                    idContainer.style.left = "10px";
-                    idContainer.style.fontSize = "12px";
-                    idContainer.style.color = "#ffffff";  // Vous pouvez ajuster la couleur selon votre thème
-                    idContainer.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-                    idContainer.style.padding = "5px";
-                    idContainer.style.borderRadius = "5px";
+                    const dateAddContainer = document.createElement("div");
+                    dateAddContainer.textContent = `DateAjoutReperimmo : ${annonce.DateAjoutReperimmo}`;  // Assurez-vous que l'ID de l'annonce est correct
+                    dateAddContainer.style.position = "absolute";
+                    dateAddContainer.style.bottom = "60px";
+                    dateAddContainer.style.left = "10px";
+                    dateAddContainer.style.fontSize = "12px";
+                    dateAddContainer.style.color = "#ffffff";  // Vous pouvez ajuster la couleur selon votre thème
+                    dateAddContainer.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                    dateAddContainer.style.padding = "5px";
+                    dateAddContainer.style.borderRadius = "5px";
 
-                    annonceDiv.appendChild(idContainer);
+                    annonceDiv.appendChild(dateAddContainer);
 
                     contentDiv.appendChild(annonceDiv);
                 }
