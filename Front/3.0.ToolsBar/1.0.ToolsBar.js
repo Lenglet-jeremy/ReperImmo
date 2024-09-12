@@ -176,9 +176,14 @@ function createTab(tabsWrapper, contentContainer, tabName) {
 
 
 function saveTabsToLocalStorage(tabsWrapper) {
-    const tabNames = Array.from(tabsWrapper.children).map(tab => tab.querySelector('span').innerText.trim());
-    localStorage.setItem('tabs', JSON.stringify(tabNames));
+    const tabsData = Array.from(tabsWrapper.children).map(tab => {
+        const tabName = tab.querySelector('span').innerText.trim();
+        const subTabs = Array.from(tab.querySelectorAll('.subTab span')).map(subTab => subTab.innerText.trim());
+        return { tabName, subTabs };
+    });
+    localStorage.setItem('tabs', JSON.stringify(tabsData));
 }
+
 
 function loadTabsFromLocalStorage(tabsWrapper, contentContainer) {
     const savedTabs = JSON.parse(localStorage.getItem('tabs'));
