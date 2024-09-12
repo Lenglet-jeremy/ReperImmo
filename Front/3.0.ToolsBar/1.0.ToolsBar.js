@@ -188,12 +188,19 @@ function saveTabsToLocalStorage(tabsWrapper) {
 function loadTabsFromLocalStorage(tabsWrapper, contentContainer) {
     const savedTabs = JSON.parse(localStorage.getItem('tabs'));
     if (savedTabs && savedTabs.length > 0) {
-        savedTabs.forEach(tabName => createTab(tabsWrapper, contentContainer, tabName));
+        // Parcourir les onglets sauvegardés et créer un onglet pour chaque nom d'onglet
+        savedTabs.forEach(tab => {
+            if (typeof tab === 'object' && tab.tabName) {
+                createTab(tabsWrapper, contentContainer, tab.tabName); // Utiliser uniquement la propriété `tabName`
+            }
+        });
     } else {
         // Si aucun onglet n'est sauvegardé, créer un onglet par défaut
         createTab(tabsWrapper, contentContainer, "Onglet par défaut");
     }
 }
+
+
 
 function createTabs(container) {
     const tabContainer = document.createElement("div");
