@@ -13,6 +13,112 @@
         </div>
         <br>
 
+        
+        <div class="SortOrder">
+            <p>Trier par :</p>
+            <select id="sortOrder" class="dropdown">
+                <option value="asc" selected>Prix au M² Croissant</option>
+                <option value="desc">Prix au M² Décroissant</option>
+                <option value="asc">Surface Croissante</option>
+                <option value="desc">Surface Décroissante</option>
+                <option value="asc">Prix Croissante</option>
+                <option value="desc">Prix Décroissante</option>
+                <option value="asc">Date de création Croissante</option>
+                <option value="desc" >Date de création Décroissante</option>
+            </select>
+        </div>
+        
+        <p style="color: #00FF00;">Catégorie</p>
+        <div class="FlagsCategorys">
+            <label>
+                <input type="checkbox" name="category" value="Maison" id="Maison">
+                Maison
+            </label>
+            <label>
+                <input type="checkbox" name="category" value="Appartement" id="Appartement">
+                Appartement
+            </label>
+            <label>
+                <input type="checkbox" name="category" value="Immeuble" id="Immeuble">
+                Immeuble
+            </label>
+            <label>
+                <input type="checkbox" name="category" value="Garage" id="Garage">
+                Garage
+            </label>
+            <label>
+                <input type="checkbox" name="category" value="Loft" id="Loft">
+                Loft
+            </label>
+            <label>
+                <input type="checkbox" name="category" value="Villa" id="Villa">
+                Villa
+            </label>
+            <label>
+                <input type="checkbox" name="category" value="Terrain" id="Terrain">
+                Terrain
+            </label>
+            <label>
+                <input type="checkbox" name="category" value="Autres" id="Autres">
+                Autres
+            </label>
+        </div>
+
+        
+        <p style="color: #00FF00;"> Budget </p>
+        <div class="Budget">
+            <div class="Min">
+                <p class="TEST">Min</p>
+                <div class="Value">
+                    <input type="text" id="minPrice"></input>
+                    <p>€</p>
+                </div>
+            </div>
+            <div class="Max">
+                <p>Max</p>
+                <div class="Value">
+                    <input type="text" id="maxPrice">
+                    <p>€</p>
+                </div>
+            </div>
+        </div>
+
+        
+        <p style="color: #00FF00;">Surface Habitable</p>
+        <div class="LivingSpace">
+            <div class="Min">
+                <p>Min</p>
+                <div class="Value">
+                    <input type="text" id="minSurface">
+                    <p>M²</p>
+                </div>
+            </div>
+            <div class="Max">
+                <p>Max</p>
+                <div class="Value">
+                    <input type="text" id="maxSurface">
+                    <p>M²</p>
+                </div>
+            </div>
+        </div>
+
+        
+        <p style="color: #00FF00;">Nombre Pieces</p>
+        <div class="PiecesNumber">
+            <div class="Min">
+                <p>Min</p>
+                <div class="Value">
+                    <input type="text" id="minNbPiece">
+                </div>
+            </div>
+            <div class="Max">
+                <p>Max</p>
+                <div class="Value">
+                    <input type="text" id="maxNbPiece">
+                </div>
+            </div>
+        </div>
+
         <div class="CityResearch">
             <p>Recherche par ville</p>
             <button><img src="./img/searchLens.webp" class="SearchIcon" alt="SearchIcon"></button>
@@ -38,13 +144,6 @@
 
         </div>
 
-        <div class="SortOrder">
-            <p>Trier par :</p>
-            <select id="sortOrder" class="dropdown">
-                <option value="desc" selected>Date de création Décroissante</option>
-                <option value="asc">Date de création Croissante</option>
-            </select>
-        </div>
 
         <div class="AderTypesArea">
             <p>Types d'annonceurs</p>
@@ -63,79 +162,10 @@
             </div>
         </div>
 
-        <p>Catégorie</p>
-        <div class="FlagsCategorys">
-            <label>
-                <input type="checkbox" name="category" value="Maison">
-                Maison
-            </label>
-            <label>
-                <input type="checkbox" name="category" value="Appartement">
-                Appartement
-            </label>
-            <label>
-                <input type="checkbox" name="category" value="Immeuble">
-                Immeuble
-            </label>
-            <label>
-                <input type="checkbox" name="category" value="Garage">
-                Garage
-            </label>
-            <label>
-                <input type="checkbox" name="category" value="Loft">
-                Loft
-            </label>
-            <label>
-                <input type="checkbox" name="category" value="Villa">
-                Villa
-            </label>
-            <label>
-                <input type="checkbox" name="category" value="Terrain">
-                Terrain
-            </label>
-            <label>
-                <input type="checkbox" name="category" value="Autres">
-                Autres
-            </label>
-        </div>
-
-
-        <p style="color: #00FF00;"> Budget </p>
-        <div class="Budget">
-            <div class="Min">
-                <p class="TEST">Min</p>
-                <div class="Value">
-                    <input type="text" id="minPrice"></input>
-                    <p>€</p>
-                </div>
-            </div>
-            <div class="Max">
-                <p>Max</p>
-                <div class="Value">
-                    <input type="text" id="maxPrice">
-                    <p>€</p>
-                </div>
-            </div>
-        </div>
         
 
-        <p style="color: #00FF00;">Surface Habitable</p>
-        <div class="LivingSpace">
-            <div class="Min">
-                <p>Min</p>
-                <div class="Value">
-                    <input type="text" id="minSurface">
-                    <p>M²</p>
-                </div>
-            </div>
-            <div class="Max">
-                <p>Max</p>
-                <div class="Value">
-                    <input type="text" id="maxSurface">
-                    <p>M²</p>
-                </div>
-            </div>
-        </div>
+        
+
 
         <p>Surface Terrain</p>
         <div class="LandSurface">
@@ -171,21 +201,6 @@
             </div>
         </div>
 
-        <p style="color: #00FF00;">Nombre Pieces</p>
-        <div class="PiecesNumber">
-            <div class="Min">
-                <p>Min</p>
-                <div class="Value">
-                    <input type="text" id="minNbPiece">
-                </div>
-            </div>
-            <div class="Max">
-                <p>Max</p>
-                <div class="Value">
-                    <input type="text" id="maxNbPiece">
-                </div>
-            </div>
-        </div>
 
         <h2>Plus de critere</h2>
         <p>Type de projet</p>

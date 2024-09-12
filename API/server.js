@@ -30,7 +30,6 @@ app.get('/api/annonces/listed', async (req, res) => {
 
 
 // Route pour ajouter une annonce à la liste des annonces listées
-// Route pour ajouter une annonce à la liste des annonces listées
 app.post('/api/annonces/listed', async (req, res) => {
     try {
         const { id } = req.body;
@@ -102,7 +101,9 @@ app.post('/api/annonces/category', async (req, res) => {
 // Route pour récupérer les annonces visibles
 app.get('/api/annonces', async (req, res) => {
     try {
+        
         let annonces = await AnnoncesGlobale.find();
+        // console.log("Annonces récupérés : ", annonces);
         res.json({annonces});
     } catch (err) {
         console.error('Erreur lors de la récupération des annonces:', err);

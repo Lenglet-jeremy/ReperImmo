@@ -1,4 +1,3 @@
-// Fonction pour créer et gérer les sous-onglets
 function createSubTabs(tabContainer) {
     const subTabContainer = document.createElement("div");
     subTabContainer.style.display = "flex";
@@ -63,6 +62,13 @@ function createTabs(container) {
     const tabsWrapper = document.createElement("div");
     tabsWrapper.style.display = "flex";
 
+    const contentContainer = document.createElement("div"); // Sous-conteneur pour le contenu des onglets
+    contentContainer.style.flexGrow = "1";
+    contentContainer.style.padding = "20px";
+    contentContainer.style.color = "#ffffff";
+    contentContainer.style.backgroundColor = "#333";
+    contentContainer.style.marginTop = "60px"; // Ajustez la marge si nécessaire
+
     const saveTabsToLocalStorage = () => {
         const tabTexts = Array.from(tabsWrapper.children).map(tab => tab.querySelector('span').innerText);
         localStorage.setItem('tabs', JSON.stringify(tabTexts));
@@ -82,11 +88,9 @@ function createTabs(container) {
         tab.style.display = "flex";
         tab.style.alignItems = "center";
         tab.style.height = "50px";
-        tab.style.marginLeft = "5px";
         tab.style.border = "1px solid #ccc";
         tab.style.borderRadius = "4px";
         tab.style.backgroundColor = "#000000";
-        tab.style.marginRight = "5px";
         tab.style.cursor = "pointer";
     
         const tabContent = document.createElement("span");
@@ -94,38 +98,41 @@ function createTabs(container) {
         tabContent.innerText = text;
         tab.appendChild(tabContent);
     
-        // Double-clic pour éditer le texte de l'onglet
+        // Ajout du double-clic pour éditer le nom de l'onglet
         tabContent.addEventListener("dblclick", () => {
             const input = document.createElement("input");
             input.type = "text";
             input.value = tabContent.innerText;
             input.style.flexGrow = "1";
-            input.style.padding = "5px";
-            input.style.border = "none";
-            input.style.outline = "none";
     
-            tab.replaceChild(input, tabContent);
-    
+            // Lorsque l'utilisateur termine l'édition (perte de focus ou touche Entrée)
             input.addEventListener("blur", () => {
-                tabContent.innerText = input.value || "Onglet sans nom";
-                tab.replaceChild(tabContent, input);
-                saveTabsToLocalStorage(); // Sauvegarde le nouveau nom de l'onglet
+                tabContent.innerText = input.value;
+                tab.replaceChild(tabContent, input);  // Remplacer le champ de texte par le texte mis à jour
+                saveTabsToLocalStorage();  // Sauvegarder les nouveaux noms des onglets
             });
     
             input.addEventListener("keydown", (e) => {
                 if (e.key === "Enter") {
-                    input.blur();
+                    input.blur();  // Simuler la perte de focus lorsque l'utilisateur appuie sur Entrée
                 }
             });
     
-            input.focus();
+            tab.replaceChild(input, tabContent);  // Remplacer le texte par un champ de texte
+            input.focus();  // Mettre le focus sur le champ pour que l'utilisateur puisse immédiatement commencer à taper
         });
     
         tab.addEventListener("click", () => {
-            const subTabContainer = tab.querySelector(".sub-tabs");
-            if (!subTabContainer) {
-                createSubTabs(tab); // Crée les sous-onglets à la volée quand on clique sur l'onglet
-            }
+            // Vider uniquement le sous-conteneur de contenu (et non l'ensemble du container)
+            contentContainer.innerHTML = ''; 
+    
+            const contentDiv = document.createElement("div");
+            contentDiv.style.padding = "20px";
+            contentDiv.style.color = "#ffffff";
+            contentDiv.style.backgroundColor = "#333";
+            contentDiv.innerText = `Contenu de l'onglet ${tabContent.innerText}`;
+    
+            contentContainer.appendChild(contentDiv);
         });
     
         const closeButton = document.createElement("span");
@@ -135,11 +142,10 @@ function createTabs(container) {
         closeButton.style.display = "flex";
         closeButton.style.justifyContent = "center";
         closeButton.style.alignItems = "center";
-        closeButton.style.width = "30px";  // Largeur du bouton
-        closeButton.style.height = "30px"; // Hauteur du bouton
-        closeButton.style.fontSize = "30px"; // Hauteur du bouton
-        closeButton.style.borderRadius = "50%"; // Optionnel : pour rendre le bouton rond
-    
+        closeButton.style.width = "30px";
+        closeButton.style.height = "30px";
+        closeButton.style.fontSize = "30px";
+        closeButton.style.borderRadius = "50%";
     
         closeButton.addEventListener("click", () => {
             tabsWrapper.removeChild(tab);
@@ -150,7 +156,7 @@ function createTabs(container) {
         tabsWrapper.appendChild(tab);
     };
     
-
+    
     const addTabButton = document.createElement("button");
     addTabButton.innerText = "+";
     addTabButton.style.padding = "5px 10px";
@@ -170,10 +176,10 @@ function createTabs(container) {
     tabContainer.appendChild(tabsWrapper);
     tabContainer.appendChild(addTabButton);
     container.appendChild(tabContainer);
+    container.appendChild(contentContainer);  // Ajout du sous-conteneur pour le contenu
 }
 
-
-// Fonction GetData pour AnnoncesMasquees et AnnoncesListees
+// Fonction GetData mise à jour pour inclure les onglets
 async function GetData(route, container, includeTabs = false) {
     container.innerHTML = '';
 

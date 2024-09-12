@@ -33,30 +33,40 @@ let maxBudget = 1000000000;
 
 let minSurface = 0; 
 let maxSurface = 1000000;
-
-
 let minNbPieces = 0; 
 let maxNbPieces = 1000000;
+
+// Tableau pour stocker les catégories sélectionnées
+let selectedCategories = [];
+
+// Fonction pour gérer les catégories sélectionnées
+function updateSelectedCategories() {
+    selectedCategories = []; // Vider le tableau à chaque mise à jour
+
+    // Récupérer toutes les cases à cocher avec le nom "category"
+    document.querySelectorAll("input[name='category']:checked").forEach((checkbox) => {
+        selectedCategories.push(checkbox.value); // Ajouter la catégorie sélectionnée
+    });
+
+    // Recharger les annonces avec les nouvelles catégories sélectionnées
+    loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
+}
 
 function filtres() {
     let minPriceInput = document.querySelector("#minPrice");
     let maxPriceInput = document.querySelector("#maxPrice");
 
-
     if (minPriceInput && maxPriceInput) {
         minPriceInput.addEventListener("change", (e) => {
             minBudget = parseFloat(e.target.value) || 0;
-            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces);
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
         });
 
         maxPriceInput.addEventListener("change", (e) => {
             maxBudget = parseFloat(e.target.value) || 1000000000;
-            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces);
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
         });
-    } else {
-        console.error("Champs de budget non trouvés.");
     }
-
 
     let minSurfaceInput = document.querySelector("#minSurface");
     let maxSurfaceInput = document.querySelector("#maxSurface");
@@ -64,17 +74,14 @@ function filtres() {
     if (minSurfaceInput && maxSurfaceInput) {
         minSurfaceInput.addEventListener("change", (e) => {
             minSurface = parseFloat(e.target.value) || 0;
-            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces);
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
         });
 
         maxSurfaceInput.addEventListener("change", (e) => {
             maxSurface = parseFloat(e.target.value) || 1000000;
-            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces);
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
         });
-    } else {
-        console.error("Champs de surface non trouvés.");
     }
-
 
     let minNbPieceInput = document.querySelector("#minNbPiece");
     let maxNbPieceInput = document.querySelector("#maxNbPiece");
@@ -82,19 +89,22 @@ function filtres() {
     if (minNbPieceInput && maxNbPieceInput) {
         minNbPieceInput.addEventListener("change", (e) => {
             minNbPieces = parseFloat(e.target.value) || 0;
-            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces);
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
         });
 
         maxNbPieceInput.addEventListener("change", (e) => {
             maxNbPieces = parseFloat(e.target.value) || 1000000;
-            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces);
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
         });
-    } else {
-        console.error("Champs de surface non trouvés.");
     }
+
+    // Ajout des événements sur les checkboxes des catégories
+    document.querySelectorAll("input[name='category']").forEach((checkbox) => {
+        checkbox.addEventListener("change", updateSelectedCategories); // Mise à jour des catégories à chaque changement
+    });
 }
 
-function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, SurfaceMax = 1000000, NbPiecesMin = 0, NbPiecesMax = 1000) {
+function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, SurfaceMax = 1000000, NbPiecesMin = 0, NbPiecesMax = 1000, categories = []) {
     fetch(`http://localhost:5000/api/annonces`)
         .then(response => response.json())
         .then(data => {
@@ -110,16 +120,28 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
             contentDiv.style.padding = "20px";
 
             data.annonces.forEach(annonce => {
-                let prixAnnonce = parseFloat(annonce.Prix.replace('€', '').replace(/\s/g, '').trim());
-                let surfaceAnnonce = annonce.surface;
-                let nbPiecesAnnonce = annonce.nombreDePieces;
+                let prixAnnonce = annonce.Prix;
+                if (typeof prixAnnonce === 'string') {
+                    prixAnnonce = parseFloat(prixAnnonce.replace(/[^\d.-]/g, '')); // Retirer tout sauf les chiffres, les points et les tirets
+                }
+
+
+                let surfaceAnnonce = annonce.Surface;
+                let nbPiecesAnnonce = annonce.NombreDePieces;
+
+                // Extraire le premier mot de TypeDeBien
+                let firstWord = annonce.TypeDeBien.split(" ")[0]; 
+                console.log(firstWord);
                 
-                
-                if (annonce.toDisplay && 
+
+
+                // Vérifiez si l'annonce correspond à une des catégories sélectionnées
+                if (annonce.toDisplay &&
                     prixAnnonce >= BudgetMin && prixAnnonce <= BudgetMax &&
                     surfaceAnnonce >= SurfaceMin && surfaceAnnonce <= SurfaceMax &&
-                    nbPiecesAnnonce >= NbPiecesMin && nbPiecesAnnonce <= NbPiecesMax) {
-                    
+                    nbPiecesAnnonce >= NbPiecesMin && nbPiecesAnnonce <= NbPiecesMax &&
+                    (categories.length === 0 || categories.includes(firstWord))) { // Utiliser le premier mot pour le filtre
+                        
                     const annonceDiv = document.createElement("div");
                     annonceDiv.classList.add("annonce");
                     annonceDiv.style.backgroundColor = "#000000";
@@ -137,7 +159,7 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
 
                     const img = document.createElement("img");
                     img.src = annonce.Image;
-                    img.alt = annonce.Titre;
+                    img.alt = "Image Annonce";
                     img.style.width = "100%";
                     img.style.height = "200px";
                     img.style.objectFit = "cover";
@@ -264,13 +286,13 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                     detailsContainer.style.marginBottom = "10px";
 
                     const surface = document.createElement("p");
-                    surface.textContent = `Surface: ${annonce.surface} m²`;
+                    surface.textContent = `Surface: ${annonce.Surface} m²`;
                     surface.style.fontSize = "16px";
                     surface.style.color = "#555";
                     detailsContainer.appendChild(surface);
 
                     const pieces = document.createElement("p");
-                    pieces.textContent = `Nombre de pièces: ${annonce.nombreDePieces}`;
+                    pieces.textContent = `Nombre de pièces: ${annonce.NombreDePieces}`;
                     pieces.style.fontSize = "16px";
                     pieces.style.color = "#555";
                     detailsContainer.appendChild(pieces);
@@ -312,6 +334,20 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                     
 
                     annonceDiv.appendChild(viewButton);
+                    // Affichage de l'ID de l'annonce en bas à gauche
+                    const idContainer = document.createElement("div");
+                    idContainer.textContent = `${annonce._id}`;  // Assurez-vous que l'ID de l'annonce est correct
+                    idContainer.style.position = "absolute";
+                    idContainer.style.bottom = "60px";
+                    idContainer.style.left = "10px";
+                    idContainer.style.fontSize = "12px";
+                    idContainer.style.color = "#ffffff";  // Vous pouvez ajuster la couleur selon votre thème
+                    idContainer.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                    idContainer.style.padding = "5px";
+                    idContainer.style.borderRadius = "5px";
+
+                    annonceDiv.appendChild(idContainer);
+
                     contentDiv.appendChild(annonceDiv);
                 }
             });
