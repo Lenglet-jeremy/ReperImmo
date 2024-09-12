@@ -1,17 +1,13 @@
-function createSubTabs(tabContainer) {
+function createSubTabs() {
     const subTabContainer = document.createElement("div");
     subTabContainer.style.display = "flex";
-    subTabContainer.style.position = "absolute";  // Rend le conteneur flottant
-    subTabContainer.style.marginTop = "0";        // Supprime la marge supérieure
-    subTabContainer.style.top = "100%";           // Positionne le conteneur juste sous l'onglet principal
-    subTabContainer.style.left = "0";             // Aligne le conteneur à gauche
-    subTabContainer.style.border = "1px solid #FFFFFF";
+    subTabContainer.style.marginTop = "10px";
     subTabContainer.style.overflowX = "scroll";
-    subTabContainer.style.backgroundColor = "#666666"; // Contexte pour le rendre visible
+    subTabContainer.style.backgroundColor = "#666666"; 
 
     const subTabsWrapper = document.createElement("div");
-    subTabsWrapper.style.height = "100%"
     subTabsWrapper.style.display = "flex";
+    subTabsWrapper.style.height = "100%";
 
     const createSubTab = (text = "Sous-onglet") => {
         const subTab = document.createElement("div");
@@ -20,10 +16,16 @@ function createSubTabs(tabContainer) {
         subTab.style.backgroundColor = "#666666";
         subTab.style.marginRight = "5px";
         subTab.style.cursor = "pointer";
-        
+
         const subTabContent = document.createElement("span");
         subTabContent.innerText = text;
         subTab.appendChild(subTabContent);
+
+        subTab.addEventListener("click", () => {
+            // Afficher le contenu associé au sous-onglet ici
+            const parentContent = subTabContainer.parentElement;
+            parentContent.querySelector(".subTabContent").innerText = `Contenu de ${text}`; // Zone de contenu du sous-onglet
+        });
 
         subTabsWrapper.appendChild(subTab);
     };
@@ -42,9 +44,17 @@ function createSubTabs(tabContainer) {
     subTabContainer.appendChild(subTabsWrapper);
     subTabContainer.appendChild(addSubTabButton);
 
+    // Ajouter un conteneur pour le contenu des sous-onglets
+    const subTabContentContainer = document.createElement("div");
+    subTabContentContainer.classList.add("subTabContent");
+    subTabContentContainer.style.marginTop = "20px";
+    subTabContentContainer.innerText = "Sélectionnez un sous-onglet...";  // Message par défaut
+
+    subTabContainer.appendChild(subTabContentContainer);
 
     return subTabContainer;
 }
+
 
 function createTabsAndCloseButton(container, contentContainer) {
     // Création du conteneur des onglets
@@ -108,7 +118,7 @@ function createTab(tabsWrapper, contentContainer, tabName) {
     tabContent.innerText = tabName;
     tab.appendChild(tabContent);
 
-    // Double-clic pour renommer l'onglet (ceci affecte uniquement l'onglet, pas le contenu associé)
+    // Double-clic pour renommer l'onglet
     tabContent.addEventListener("dblclick", () => {
         const input = document.createElement("input");
         input.type = "text";
@@ -116,7 +126,6 @@ function createTab(tabsWrapper, contentContainer, tabName) {
         input.style.width = "100px"; // Largeur du champ de texte
         tab.replaceChild(input, tabContent);
 
-        // Sauvegarde du nouveau nom de l'onglet après édition
         const saveTabName = () => {
             tabContent.innerText = input.value;
             tab.replaceChild(tabContent, input);
@@ -146,20 +155,24 @@ function createTab(tabsWrapper, contentContainer, tabName) {
     tab.appendChild(closeButton);
     tabsWrapper.appendChild(tab);
 
-    // Gestion de l'affichage du contenu lié à l'onglet (le nom ici ne change pas lorsque l'onglet est renommé)
+    // Affichage du contenu lié à l'onglet avec les sous-onglets
     tab.addEventListener("click", () => {
         contentContainer.innerHTML = ''; 
+        
         const contentDiv = document.createElement("div");
         contentDiv.style.padding = "20px";
         contentDiv.style.color = "#ffffff";
         contentDiv.style.backgroundColor = "#333";
-        contentDiv.innerText = `Contenu de l'onglet ${tabName}`; // On utilise le nom initial ici
+        contentDiv.innerText = `Contenu de l'onglet ${tabName}`;
+
+        // Ajouter le conteneur des sous-onglets dans le contenu de l'onglet
+        const subTabContainer = createSubTabs();  // Sous-onglets créés ici
+        contentDiv.appendChild(subTabContainer);  // Ajouter les sous-onglets dans le contenu de l'onglet
         contentContainer.appendChild(contentDiv);
     });
 
     saveTabsToLocalStorage(tabsWrapper);  // Sauvegarder les onglets dans le localStorage
 }
-
 
 
 function saveTabsToLocalStorage(tabsWrapper) {
@@ -351,7 +364,6 @@ async function GetData(route, container, includeTabs = false) {
     }
 }
 
-
 function AnnoncesMasquees() {
     const contentDiv = document.querySelector(".ToolsBar");
     const modalMasquees = document.createElement("div");
@@ -441,7 +453,6 @@ function AnnoncesMasquees() {
     });
 }
 
-
 function AnnoncesListees() {
     const contentDiv = document.querySelector(".ToolsBar");
 
@@ -483,8 +494,6 @@ function AnnoncesListees() {
         modalList.style.display = "flex";
     });
 }
-
-
 
 function gestionAnnonces() {
     AnnoncesMasquees();
