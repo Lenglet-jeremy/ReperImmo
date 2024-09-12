@@ -1,0 +1,25 @@
+.ToolsBar{
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    border: 1px solid #FFFFFF;
+    height: 55px;
+
+    padding: 0px 20px;
+
+    div{
+        display: flex;
+        gap: 10px;
+    }
+}
+
+.AnnoncesMasquee{
+    background-color: #FF0000;
+}
+
+.AnnoncesListe{
+    background-color: #FF0000;
+}
