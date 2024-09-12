@@ -1,9 +1,9 @@
-function createSubTabs() {
+function createSubTabs(tabName) {
     const subTabContainer = document.createElement("div");
     subTabContainer.style.display = "flex";
     subTabContainer.style.marginTop = "10px";
     subTabContainer.style.overflowX = "scroll";
-    subTabContainer.style.backgroundColor = "#666666"; 
+    subTabContainer.style.backgroundColor = "#666666";
 
     const subTabsWrapper = document.createElement("div");
     subTabsWrapper.style.display = "flex";
@@ -22,9 +22,11 @@ function createSubTabs() {
         subTab.appendChild(subTabContent);
 
         subTab.addEventListener("click", () => {
-            // Afficher le contenu associé au sous-onglet ici
             const parentContent = subTabContainer.parentElement;
-            parentContent.querySelector(".subTabContent").innerText = `Contenu de ${text}`; // Zone de contenu du sous-onglet
+            parentContent.querySelector(".subTabContent").innerText = `Contenu de ${text}`;
+            
+            // Sauvegarder le sous-onglet actif
+            saveActiveSubTabToLocalStorage(tabName, text);
         });
 
         subTabsWrapper.appendChild(subTab);
@@ -38,22 +40,39 @@ function createSubTabs() {
     addSubTabButton.style.cursor = "pointer";
 
     addSubTabButton.addEventListener("click", () => {
-        createSubTab("Nouveau sous-onglet");
+        const newSubTabText = `Nouveau sous-onglet ${subTabsWrapper.children.length + 1}`;
+        createSubTab(newSubTabText);
+        
+        // Sauvegarder les sous-onglets après ajout
+        const subTabTexts = Array.from(subTabsWrapper.children).map(subTab => subTab.innerText.trim());
+        saveSubTabsToLocalStorage(tabName, subTabTexts);
     });
 
     subTabContainer.appendChild(subTabsWrapper);
     subTabContainer.appendChild(addSubTabButton);
 
-    // Ajouter un conteneur pour le contenu des sous-onglets
     const subTabContentContainer = document.createElement("div");
     subTabContentContainer.classList.add("subTabContent");
     subTabContentContainer.style.marginTop = "20px";
-    subTabContentContainer.innerText = "Sélectionnez un sous-onglet...";  // Message par défaut
-
+    subTabContentContainer.innerText = "Sélectionnez un sous-onglet...";
     subTabContainer.appendChild(subTabContentContainer);
+
+    // Charger les sous-onglets sauvegardés
+    const savedSubTabs = loadSubTabsFromLocalStorage(tabName);
+    savedSubTabs.forEach(subTabName => createSubTab(subTabName));
+
+    // Restaurer le sous-onglet actif
+    const activeSubTab = loadActiveSubTabFromLocalStorage(tabName);
+    if (activeSubTab) {
+        const activeSubTabElement = Array.from(subTabsWrapper.children).find(subTab => subTab.innerText === activeSubTab);
+        if (activeSubTabElement) {
+            activeSubTabElement.click();
+        }
+    }
 
     return subTabContainer;
 }
+
 
 
 function createTabsAndCloseButton(container, contentContainer) {
@@ -158,18 +177,18 @@ function createTab(tabsWrapper, contentContainer, tabName) {
     // Affichage du contenu lié à l'onglet avec les sous-onglets
     tab.addEventListener("click", () => {
         contentContainer.innerHTML = ''; 
-        
+    
         const contentDiv = document.createElement("div");
         contentDiv.style.padding = "20px";
         contentDiv.style.color = "#ffffff";
         contentDiv.style.backgroundColor = "#333";
         contentDiv.innerText = `Contenu de l'onglet ${tabName}`;
-
-        // Ajouter le conteneur des sous-onglets dans le contenu de l'onglet
-        const subTabContainer = createSubTabs();  // Sous-onglets créés ici
-        contentDiv.appendChild(subTabContainer);  // Ajouter les sous-onglets dans le contenu de l'onglet
+    
+        const subTabContainer = createSubTabs(tabName);  // Passer le nom de l'onglet à createSubTabs
+        contentDiv.appendChild(subTabContainer);
         contentContainer.appendChild(contentDiv);
     });
+    
 
     saveTabsToLocalStorage(tabsWrapper);  // Sauvegarder les onglets dans le localStorage
 }
@@ -178,10 +197,43 @@ function createTab(tabsWrapper, contentContainer, tabName) {
 function saveTabsToLocalStorage(tabsWrapper) {
     const tabsData = Array.from(tabsWrapper.children).map(tab => {
         const tabName = tab.querySelector('span').innerText.trim();
-        const subTabs = Array.from(tab.querySelectorAll('.subTab span')).map(subTab => subTab.innerText.trim());
+        const subTabs = Array.from(tab.querySelectorAll('.subTabContent span')).map(subTab => subTab.innerText.trim());
         return { tabName, subTabs };
     });
     localStorage.setItem('tabs', JSON.stringify(tabsData));
+}
+
+
+function saveSubTabsToLocalStorage(tabName, subTabs) {
+    const savedTabs = JSON.parse(localStorage.getItem('tabs')) || [];
+    const tab = savedTabs.find(t => t.tabName === tabName);
+    if (tab) {
+        tab.subTabs = subTabs;
+    } else {
+        savedTabs.push({ tabName, subTabs });
+    }
+    localStorage.setItem('tabs', JSON.stringify(savedTabs));
+}
+
+function loadSubTabsFromLocalStorage(tabName) {
+    const savedTabs = JSON.parse(localStorage.getItem('tabs')) || [];
+    const tab = savedTabs.find(t => t.tabName === tabName);
+    return tab ? tab.subTabs : [];
+}
+
+function saveActiveSubTabToLocalStorage(tabName, activeSubTab) {
+    const savedTabs = JSON.parse(localStorage.getItem('tabs')) || [];
+    const tab = savedTabs.find(t => t.tabName === tabName);
+    if (tab) {
+        tab.activeSubTab = activeSubTab;
+    }
+    localStorage.setItem('tabs', JSON.stringify(savedTabs));
+}
+
+function loadActiveSubTabFromLocalStorage(tabName) {
+    const savedTabs = JSON.parse(localStorage.getItem('tabs')) || [];
+    const tab = savedTabs.find(t => t.tabName === tabName);
+    return tab ? tab.activeSubTab : null;
 }
 
 
@@ -191,7 +243,15 @@ function loadTabsFromLocalStorage(tabsWrapper, contentContainer) {
         // Parcourir les onglets sauvegardés et créer un onglet pour chaque nom d'onglet
         savedTabs.forEach(tab => {
             if (typeof tab === 'object' && tab.tabName) {
-                createTab(tabsWrapper, contentContainer, tab.tabName); // Utiliser uniquement la propriété `tabName`
+                const newTab = createTab(tabsWrapper, contentContainer, tab.tabName); // Crée l'onglet
+
+                // Si des sous-onglets sont sauvegardés, les recréer
+                if (tab.subTabs && tab.subTabs.length > 0) {
+                    const subTabContainer = newTab.querySelector('.subTabContent');
+                    tab.subTabs.forEach(subTabName => {
+                        createSubTab(subTabContainer, subTabName); // Recrée les sous-onglets
+                    });
+                }
             }
         });
     } else {
@@ -199,6 +259,7 @@ function loadTabsFromLocalStorage(tabsWrapper, contentContainer) {
         createTab(tabsWrapper, contentContainer, "Onglet par défaut");
     }
 }
+
 
 
 
