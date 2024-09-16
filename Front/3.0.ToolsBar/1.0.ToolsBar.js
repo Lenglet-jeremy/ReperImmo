@@ -107,6 +107,22 @@ function createMenuBar() {
     return menuBar;
 }
 
+function deleteTab(tab, tabsWrapper) {
+    const tabName = tab.querySelector("span").innerText;
+    
+    // Suppression de l'onglet
+    tabsWrapper.removeChild(tab);
+
+    // Supprimer les menus de cet onglet dans localStorage
+    const savedMenus = JSON.parse(localStorage.getItem('tabMenus')) || {};
+    delete savedMenus[tabName];
+    localStorage.setItem('tabMenus', JSON.stringify(savedMenus));
+
+    // Sauvegarder les onglets restants
+    saveTabsToLocalStorage(tabsWrapper);
+}
+
+
 function createMenu(menuName = "Menu", menuWrapper = null) {
     // Si aucun menuWrapper n'est fourni, on prend celui de l'onglet actuel
     if (!menuWrapper) {
@@ -164,12 +180,30 @@ function createMenu(menuName = "Menu", menuWrapper = null) {
         saveMenusToLocalStorage(currentTabName, menuWrapper);
     });
 
+    // ======================================================================
+    // ======================================================================
+    // ======================================================================
+    // ======================================================================
+    // ======================================================================
     menu.addEventListener("click", () => {
         const contentArea = document.querySelector(".MenuContentArea");
         contentArea.innerHTML = '';
-        const menuContent = createContentMenu();
-        contentArea.appendChild(menuContent);
+
+        const annoncesMenu = JSON.parse(localStorage.getItem(menuName)) || [];
+
+        annoncesMenu.forEach(annonce => {
+            const annonceDiv = document.createElement("div");
+            annonceDiv.classList.add("annonce");
+            console.log(annonce);
+            
+            contentArea.appendChild(annonceDiv);
+        });
     });
+    // ======================================================================
+    // ======================================================================
+    // ======================================================================
+    // ======================================================================
+    // ======================================================================
 
     container.appendChild(menu);
     container.appendChild(deleteButton);
@@ -194,6 +228,11 @@ function createContentMenu() {
 }
 
 function createTab(tabsWrapper, contentContainer, tabName) {
+
+    if (!tabName || Array.from(tabsWrapper.children).some(tab => tab.innerText === tabName)) {
+        console.error("Nom d'onglet invalide ou déjà existant.");
+        return;
+    }
     const tab = document.createElement("div");
     tab.style.padding = "10px";
     tab.style.backgroundColor = "#000000";
@@ -303,8 +342,13 @@ function loadMenusFromLocalStorage(tabName, menuWrapper) {
 }
 
 function saveMenusToLocalStorage(tabName, menuWrapper) {
+    if (!tabName) {
+        console.error("Le nom de l'onglet est vide, impossible de sauvegarder les menus.");
+        return;
+    }
+
     if (!(menuWrapper instanceof Element)) {
-        console.error("menuWrapper is not a valid DOM element:", menuWrapper);
+        console.error("menuWrapper n'est pas un élément DOM valide :", menuWrapper);
         return;
     }
 
@@ -315,6 +359,7 @@ function saveMenusToLocalStorage(tabName, menuWrapper) {
 
     updateTabMenu(tabName, menus);
 }
+
 
 
 
@@ -542,17 +587,27 @@ function AnnoncesMasquees() {
                 restoreButton.style.borderRadius = "4px";
                 restoreButton.style.cursor = "pointer";
 
-                restoreButton.addEventListener("click", () => {
-                    fetch("http://localhost:5000/api/annonces/show", {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ id: annonce._id })
-                    }).then(() => {
-                        annonceDiv.remove();
-                    });
+                restoreButton.addEventListener("click", async () => {
+                    try {
+                        const response = await fetch("http://localhost:5000/api/annonces/show", {
+                            method: "PUT",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ id: annonce._id })
+                        });
+                
+                        if (response.ok) {
+                            annonceDiv.remove();
+                            alert("Annonce restaurée avec succès !");
+                        } else {
+                            console.error("Erreur lors de la restauration de l'annonce");
+                        }
+                    } catch (error) {
+                        console.error("Erreur lors de la requête :", error);
+                    }
                 });
+                
 
                 annonceDiv.appendChild(restoreButton);
                 modalMasquees.appendChild(annonceDiv);

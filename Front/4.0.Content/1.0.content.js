@@ -285,6 +285,8 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
 
                     // Charger les menus disponibles depuis les onglets et les afficher dans le menu déroulant
                     const tabsAndMenus = getTabsAndMenus();
+
+                    // Add the menus to the dropdown menu
                     tabsAndMenus.forEach(tab => {
                         tab.menus.forEach(menu => {
                             const menuItem = document.createElement("li");
@@ -292,13 +294,18 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                             menuItem.style.cursor = "pointer";
                             menuItem.textContent = menu;
 
+                            // Add an event listener to add the announcement to the selected menu
                             menuItem.addEventListener("click", () => {
-                                // Logic pour insérer l'annonce dans le menu sélectionné
-                                showNotification(`Annonce ajoutée à ${menu}`);
+                                // Add the announcement to the selected menu
+                                const annoncesMenu = JSON.parse(localStorage.getItem(menu)) || [];
+                                annoncesMenu.push(annonce);
+                                localStorage.setItem(menu, JSON.stringify(annoncesMenu));
 
-                                // Ici vous pouvez ajouter le code pour mettre à jour l'annonce dans le menu sélectionné
-                                // et sauvegarder les modifications si nécessaire
-                                dropdownMenu.style.display = "none"; // cacher le menu après l'ajout
+                                // Hide the dropdown menu
+                                dropdownMenu.style.display = "none";
+
+                                // Show a notification
+                                showNotification(`Annonce ajoutée à ${menu}`);
                             });
 
                             dropdownMenu.appendChild(menuItem);
@@ -309,13 +316,15 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                     addButton.appendChild(dropdownMenu);
 
                     
+                    // Show the dropdown menu when the add button is clicked
                     addButton.addEventListener("click", (e) => {
-                        e.stopPropagation(); // Empêche de fermer le menu si on clique sur le bouton "+"
+                        e.stopPropagation();
                         dropdownMenu.style.display = dropdownMenu.style.display === "none" ? "block" : "none";
                     });
 
+                    // Hide the dropdown menu when the user clicks outside of it
                     document.body.addEventListener("click", () => {
-                        dropdownMenu.style.display = "none"; // Cacher le menu si on clique en dehors
+                        dropdownMenu.style.display = "none";
                     });
 
                     const hideButton = document.createElement("span");
