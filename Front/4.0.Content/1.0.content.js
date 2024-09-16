@@ -130,7 +130,6 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
             });
 
             // Appliquer le tri en fonction de la sélection de l'utilisateur
-            // Appliquer le tri en fonction de la sélection de l'utilisateur
             if (sortOrder === "PrixCroissant") {
                 filteredAnnonces.sort((a, b) => {
                     let prixA = parseFloat(a.Prix.replace(/[^\d.-]/g, ''));
@@ -267,10 +266,57 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                     addButton.style.display = "flex";
                     addButton.style.justifyContent = "center";
                     
-                    
-                    
-
                     buttonContainer.appendChild(addButton);
+
+                    // Création du menu déroulant pour l'ajout dans un menu spécifique
+                    const dropdownMenu = document.createElement("ul");
+                    dropdownMenu.style.position = "absolute";
+                    dropdownMenu.style.top = "40px"; // juste en dessous du bouton "+"
+                    dropdownMenu.style.left = "0";
+                    dropdownMenu.style.backgroundColor = "#fff";
+                    dropdownMenu.style.border = "1px solid #ddd";
+                    dropdownMenu.style.padding = "10px";
+                    dropdownMenu.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+                    dropdownMenu.style.display = "none"; // le menu est caché par défaut
+                    dropdownMenu.style.listStyle = "none";
+                    dropdownMenu.style.width = "150px";
+                    dropdownMenu.style.zIndex = "1000";
+                    dropdownMenu.style.borderRadius = "5px";
+
+                    // Charger les menus disponibles depuis les onglets et les afficher dans le menu déroulant
+                    const tabsAndMenus = getTabsAndMenus();
+                    tabsAndMenus.forEach(tab => {
+                        tab.menus.forEach(menu => {
+                            const menuItem = document.createElement("li");
+                            menuItem.style.padding = "8px";
+                            menuItem.style.cursor = "pointer";
+                            menuItem.textContent = menu;
+
+                            menuItem.addEventListener("click", () => {
+                                // Logic pour insérer l'annonce dans le menu sélectionné
+                                showNotification(`Annonce ajoutée à ${menu}`);
+
+                                // Ici vous pouvez ajouter le code pour mettre à jour l'annonce dans le menu sélectionné
+                                // et sauvegarder les modifications si nécessaire
+                                dropdownMenu.style.display = "none"; // cacher le menu après l'ajout
+                            });
+
+                            dropdownMenu.appendChild(menuItem);
+                        });
+                    });
+
+                        
+                    addButton.appendChild(dropdownMenu);
+
+                    
+                    addButton.addEventListener("click", (e) => {
+                        e.stopPropagation(); // Empêche de fermer le menu si on clique sur le bouton "+"
+                        dropdownMenu.style.display = dropdownMenu.style.display === "none" ? "block" : "none";
+                    });
+
+                    document.body.addEventListener("click", () => {
+                        dropdownMenu.style.display = "none"; // Cacher le menu si on clique en dehors
+                    });
 
                     const hideButton = document.createElement("span");
                     hideButton.innerHTML = "&times;";

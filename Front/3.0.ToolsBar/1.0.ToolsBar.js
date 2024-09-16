@@ -1,84 +1,35 @@
-function createSubTabs(tabName) {
-    const subTabContainer = document.createElement("div");
-    subTabContainer.style.display = "flex";
-    subTabContainer.style.marginTop = "10px";
-    subTabContainer.style.overflowX = "scroll";
-    subTabContainer.style.backgroundColor = "#666666";
+let tabMenus = {}; // Stocke les menus pour chaque onglet
+let currentTabName = ""; // Suivi de l'onglet actif
 
-    const subTabsWrapper = document.createElement("div");
-    subTabsWrapper.style.display = "flex";
-    subTabsWrapper.style.height = "100%";
+function getTabsAndMenus() {
+    let tabsAndMenus = [];
 
-    const createSubTab = (text = "Sous-onglet") => {
-        const subTab = document.createElement("div");
-        subTab.style.padding = "5px 10px";
-        subTab.style.border = "1px solid #ccc";
-        subTab.style.backgroundColor = "#666666";
-        subTab.style.marginRight = "5px";
-        subTab.style.cursor = "pointer";
+    // Récupérer les onglets et les menus sauvegardés
+    const savedTabs = JSON.parse(localStorage.getItem('tabs')) || [];
+    const savedMenus = JSON.parse(localStorage.getItem('tabMenus')) || {};
 
-        const subTabContent = document.createElement("span");
-        subTabContent.innerText = text;
-        subTab.appendChild(subTabContent);
+    savedTabs.forEach(tab => {
+        const tabName = tab.tabName;
+        let menus = savedMenus[tabName] ? JSON.parse(JSON.stringify(savedMenus[tabName])) : [];
 
-        subTab.addEventListener("click", () => {
-            const parentContent = subTabContainer.parentElement;
-            parentContent.querySelector(".subTabContent").innerText = `Contenu de ${text}`;
-            
-            // Sauvegarder le sous-onglet actif
-            saveActiveSubTabToLocalStorage(tabName, text);
+        tabsAndMenus.push({
+            tabName: tabName,
+            menus: menus
         });
-
-        subTabsWrapper.appendChild(subTab);
-    };
-
-    const addSubTabButton = document.createElement("button");
-    addSubTabButton.innerText = "+ Sous-onglet";
-    addSubTabButton.style.padding = "5px 10px";
-    addSubTabButton.style.border = "none";
-    addSubTabButton.style.backgroundColor = "#f0f0f0";
-    addSubTabButton.style.cursor = "pointer";
-
-    addSubTabButton.addEventListener("click", () => {
-        const newSubTabText = `Nouveau sous-onglet ${subTabsWrapper.children.length + 1}`;
-        createSubTab(newSubTabText);
-        
-        // Sauvegarder les sous-onglets après ajout
-        const subTabTexts = Array.from(subTabsWrapper.children).map(subTab => subTab.innerText.trim());
-        saveSubTabsToLocalStorage(tabName, subTabTexts);
     });
 
-    subTabContainer.appendChild(subTabsWrapper);
-    subTabContainer.appendChild(addSubTabButton);
-
-    const subTabContentContainer = document.createElement("div");
-    subTabContentContainer.classList.add("subTabContent");
-    subTabContentContainer.style.marginTop = "20px";
-    subTabContentContainer.innerText = "Sélectionnez un sous-onglet...";
-    subTabContainer.appendChild(subTabContentContainer);
-
-    // Charger les sous-onglets sauvegardés
-    const savedSubTabs = loadSubTabsFromLocalStorage(tabName);
-    savedSubTabs.forEach(subTabName => createSubTab(subTabName));
-
-    // Restaurer le sous-onglet actif
-    const activeSubTab = loadActiveSubTabFromLocalStorage(tabName);
-    if (activeSubTab) {
-        const activeSubTabElement = Array.from(subTabsWrapper.children).find(subTab => subTab.innerText === activeSubTab);
-        if (activeSubTabElement) {
-            activeSubTabElement.click();
-        }
-    }
-
-    return subTabContainer;
+    return tabsAndMenus;
 }
 
-
+function updateTabMenu(tabName, updatedMenus) {
+    const savedMenus = JSON.parse(localStorage.getItem('tabMenus')) || {};
+    savedMenus[tabName] = updatedMenus;
+    localStorage.setItem('tabMenus', JSON.stringify(savedMenus));
+}
 
 function createTabsAndCloseButton(container, contentContainer) {
-    // Création du conteneur des onglets
     const tabContainer = document.createElement("div");
-    tabContainer.classList.add("TabContainer")
+    tabContainer.classList.add("TabContainer");
     tabContainer.style.display = "flex";
     tabContainer.style.alignItems = "center";
     tabContainer.style.justifyContent = "space-between";
@@ -86,24 +37,22 @@ function createTabsAndCloseButton(container, contentContainer) {
     tabContainer.style.borderBottom = "1px solid #FFFFFF";
     tabContainer.style.padding = "0px 10px";
     tabContainer.style.overflowX = "scroll";
-    tabContainer.style.backgroundColor = "#222"; // Arrière-plan sombre pour les onglets
+    tabContainer.style.backgroundColor = "#222"; // Arrière-plan sombre
 
     const tabsWrapper = document.createElement("div");
-    tabsWrapper.style.display = "flex";
-    tabsWrapper.style.flexGrow = "1";
 
     const addTabButton = document.createElement("button");
-    addTabButton.innerText = "+ Ajouter onglet";
+    addTabButton.innerText = "Ajouter onglet";
     addTabButton.style.padding = "5px 10px";
-    addTabButton.style.marginLeft = "auto";
     addTabButton.style.border = "none";
+    addTabButton.style.marginLeft = "auto";
     addTabButton.style.backgroundColor = "#f0f0f0";
     addTabButton.style.cursor = "pointer";
     addTabButton.addEventListener("click", () => {
-        createTab(tabsWrapper, contentContainer, "Nouvel onglet");
+        const newTabName = "Nouvel onglet";
+        createTab(tabsWrapper, contentContainer, newTabName);
     });
 
-    // Bouton de fermeture
     const closeButton = document.createElement("span");
     closeButton.style.cursor = "pointer";
     closeButton.style.color = "#FFFFFF";
@@ -123,21 +72,147 @@ function createTabsAndCloseButton(container, contentContainer) {
     loadTabsFromLocalStorage(tabsWrapper, contentContainer);
 }
 
+function createMenuBar() {
+    const menuBar = document.createElement("div");
+    menuBar.classList.add("MenuBar");
+    menuBar.style.width = "200px";
+    menuBar.style.height = "100%";
+    menuBar.style.display = "flex";
+    menuBar.style.flexDirection = "column";
+    menuBar.style.justifyContent = "space-between";
+    menuBar.style.border = "1px solid #FFFFFF";
+
+    const menuWrapper = document.createElement("div");
+    menuWrapper.classList.add("MenuWrapper");
+    menuWrapper.style.flexDirection = "column";
+    menuWrapper.style.justifyContent = "space-between";
+
+    const addMenu = document.createElement("button");
+    addMenu.innerText = "Ajouter menu";
+    addMenu.style.border = "1px solid #FFFFFF";
+    addMenu.style.margin = "20px";
+
+    addMenu.addEventListener("click", () => {
+        const menu = createMenu();
+        menuWrapper.appendChild(menu);
+        saveMenusToLocalStorage(currentTabName, menuWrapper); // Sauvegarder les menus de l'onglet actif
+    });
+
+    menuBar.appendChild(menuWrapper);
+    menuBar.appendChild(addMenu);
+
+    // Charger les menus de l'onglet actif
+    loadMenusFromLocalStorage(currentTabName, menuWrapper);
+
+    return menuBar;
+}
+
+function createMenu(menuName = "Menu", menuWrapper = null) {
+    // Si aucun menuWrapper n'est fourni, on prend celui de l'onglet actuel
+    if (!menuWrapper) {
+        menuWrapper = document.querySelector(".MenuWrapper");
+    }
+
+    const container = document.createElement("div");
+    container.classList.add("MenuContainer");
+    container.style.display = "flex";
+    container.style.alignItems = "center";
+    container.style.width = "100%";
+
+    const menu = document.createElement("div");
+    menu.classList.add("Menu");
+    menu.innerText = menuName;
+    menu.style.flexGrow = "1";
+    menu.style.height = "30px";
+    menu.style.cursor = "pointer";
+    menu.style.display = "flex";
+    menu.style.alignItems = "center";
+    menu.style.paddingLeft = "10px";
+
+    function enableEditing() {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = menu.innerText;
+        input.style.flexGrow = "1";
+        input.style.height = "30px";
+
+        input.addEventListener("blur", () => {
+            menu.innerText = input.value;
+            container.replaceChild(menu, input);
+            saveMenusToLocalStorage(currentTabName, menuWrapper);
+        });
+
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                input.blur();
+            }
+        });
+
+        container.replaceChild(input, menu);
+        input.focus();
+    }
+
+    menu.addEventListener("dblclick", enableEditing);
+
+    const deleteButton = document.createElement("button");
+    deleteButton.innerText = "X";
+    deleteButton.style.marginRight = "20px";
+    deleteButton.style.width = "20px";
+
+    deleteButton.addEventListener("click", () => {
+        container.remove();
+        saveMenusToLocalStorage(currentTabName, menuWrapper);
+    });
+
+    menu.addEventListener("click", () => {
+        const contentArea = document.querySelector(".MenuContentArea");
+        contentArea.innerHTML = '';
+        const menuContent = createContentMenu();
+        contentArea.appendChild(menuContent);
+    });
+
+    container.appendChild(menu);
+    container.appendChild(deleteButton);
+
+    return container;
+}
+
+
+function createContentMenu() {
+    const menuContent = document.createElement("div");
+    menuContent.classList.add("menuContent");
+    menuContent.innerText = "Contenu";
+    menuContent.style.width = "100%";
+    menuContent.style.height = "100%";
+    menuContent.style.display = "flex";
+    menuContent.style.justifyContent = "center";
+    menuContent.style.alignItems = "center";
+    menuContent.style.color = "#FFFFFF";
+    menuContent.style.backgroundColor = "#333";
+
+    return menuContent;
+}
+
 function createTab(tabsWrapper, contentContainer, tabName) {
     const tab = document.createElement("div");
     tab.style.padding = "10px";
-    tab.style.marginRight = "10px";
     tab.style.backgroundColor = "#000000";
     tab.style.color = "#FFFFFF";
     tab.style.cursor = "pointer";
     tab.style.border = "1px solid #ccc";
     tab.style.borderRadius = "4px";
-    
+
     const tabContent = document.createElement("span");
     tabContent.innerText = tabName;
     tab.appendChild(tabContent);
 
-    // Double-clic pour renommer l'onglet
+    const menuContentArea = document.createElement("div");
+    menuContentArea.classList.add("MenuContentArea");
+    menuContentArea.style.flexGrow = "1";
+    menuContentArea.style.width = "100%";
+    menuContentArea.style.height = "100%";
+
+    // Renommer l'onglet
     tabContent.addEventListener("dblclick", () => {
         const input = document.createElement("input");
         input.type = "text";
@@ -148,7 +223,7 @@ function createTab(tabsWrapper, contentContainer, tabName) {
         const saveTabName = () => {
             tabContent.innerText = input.value;
             tab.replaceChild(tabContent, input);
-            saveTabsToLocalStorage(); // Sauvegarde dans localStorage
+            saveTabsToLocalStorage(tabsWrapper);
         };
 
         input.addEventListener("blur", saveTabName);
@@ -161,103 +236,84 @@ function createTab(tabsWrapper, contentContainer, tabName) {
         input.focus();
     });
 
-    // Gestion de la fermeture de l'onglet
+    // Fermeture de l'onglet
     const closeButton = document.createElement("span");
     closeButton.innerHTML = "&times;";
     closeButton.style.cursor = "pointer";
     closeButton.style.marginLeft = "10px";
     closeButton.addEventListener("click", () => {
         tabsWrapper.removeChild(tab);
-        saveTabsToLocalStorage(tabsWrapper);  // Sauvegarder après la suppression
+        saveTabsToLocalStorage(tabsWrapper);
     });
 
     tab.appendChild(closeButton);
     tabsWrapper.appendChild(tab);
 
-    // Affichage du contenu lié à l'onglet avec les sous-onglets
+    // Afficher le contenu lié à l'onglet
     tab.addEventListener("click", () => {
-        contentContainer.innerHTML = ''; 
-    
+        currentTabName = tabContent.innerText;
+        contentContainer.innerHTML = '';
+
         const contentDiv = document.createElement("div");
-        contentDiv.style.padding = "20px";
-        contentDiv.style.color = "#ffffff";
-        contentDiv.style.backgroundColor = "#333";
-        contentDiv.innerText = `Contenu de l'onglet ${tabName}`;
-    
-        const subTabContainer = createSubTabs(tabName);  // Passer le nom de l'onglet à createSubTabs
-        contentDiv.appendChild(subTabContainer);
+        contentDiv.classList.add("ContentDiv");
+        contentDiv.style.gap = "0px";
+        contentDiv.style.width = "100%";
+
+        const menuBar = createMenuBar(); // Appeler createMenuBar sans paramètres car currentTabName est mis à jour
+        const menuContentArea = document.createElement("div");
+        menuContentArea.classList.add("MenuContentArea");
+        menuContentArea.style.width = "100%";
+
+        contentDiv.appendChild(menuBar);
+        contentDiv.appendChild(menuContentArea);
+
         contentContainer.appendChild(contentDiv);
     });
-    
 
-    saveTabsToLocalStorage(tabsWrapper);  // Sauvegarder les onglets dans le localStorage
-}
-
-
-function saveTabsToLocalStorage(tabsWrapper) {
-    const tabsData = Array.from(tabsWrapper.children).map(tab => {
-        const tabName = tab.querySelector('span').innerText.trim();
-        const subTabs = Array.from(tab.querySelectorAll('.subTabContent span')).map(subTab => subTab.innerText.trim());
-        return { tabName, subTabs };
-    });
-    localStorage.setItem('tabs', JSON.stringify(tabsData));
-}
-
-
-function saveSubTabsToLocalStorage(tabName, subTabs) {
-    const savedTabs = JSON.parse(localStorage.getItem('tabs')) || [];
-    const tab = savedTabs.find(t => t.tabName === tabName);
-    if (tab) {
-        tab.subTabs = subTabs;
-    } else {
-        savedTabs.push({ tabName, subTabs });
-    }
-    localStorage.setItem('tabs', JSON.stringify(savedTabs));
-}
-
-function loadSubTabsFromLocalStorage(tabName) {
-    const savedTabs = JSON.parse(localStorage.getItem('tabs')) || [];
-    const tab = savedTabs.find(t => t.tabName === tabName);
-    return tab ? tab.subTabs : [];
-}
-
-function saveActiveSubTabToLocalStorage(tabName, activeSubTab) {
-    const savedTabs = JSON.parse(localStorage.getItem('tabs')) || [];
-    const tab = savedTabs.find(t => t.tabName === tabName);
-    if (tab) {
-        tab.activeSubTab = activeSubTab;
-    }
-    localStorage.setItem('tabs', JSON.stringify(savedTabs));
-}
-
-function loadActiveSubTabFromLocalStorage(tabName) {
-    const savedTabs = JSON.parse(localStorage.getItem('tabs')) || [];
-    const tab = savedTabs.find(t => t.tabName === tabName);
-    return tab ? tab.activeSubTab : null;
+    saveTabsToLocalStorage(tabsWrapper);
 }
 
 
 function loadTabsFromLocalStorage(tabsWrapper, contentContainer) {
-    const savedTabs = JSON.parse(localStorage.getItem('tabs'));
-    if (savedTabs && savedTabs.length > 0) {
-        // Parcourir les onglets sauvegardés et créer un onglet pour chaque nom d'onglet
-        savedTabs.forEach(tab => {
-            if (typeof tab === 'object' && tab.tabName) {
-                const newTab = createTab(tabsWrapper, contentContainer, tab.tabName); // Crée l'onglet
+    const savedTabs = JSON.parse(localStorage.getItem("tabs")) || [];
+    savedTabs.forEach(tabData => {
+        createTab(tabsWrapper, contentContainer, tabData.tabName);
+    });
+}
 
-                // Si des sous-onglets sont sauvegardés, les recréer
-                if (tab.subTabs && tab.subTabs.length > 0) {
-                    const subTabContainer = newTab.querySelector('.subTabContent');
-                    tab.subTabs.forEach(subTabName => {
-                        createSubTab(subTabContainer, subTabName); // Recrée les sous-onglets
-                    });
-                }
-            }
-        });
-    } else {
-        // Si aucun onglet n'est sauvegardé, créer un onglet par défaut
-        createTab(tabsWrapper, contentContainer, "Onglet par défaut");
+function saveTabsToLocalStorage(tabsWrapper) {
+    const tabs = [];
+    tabsWrapper.querySelectorAll("div").forEach(tab => {
+        const tabName = tab.querySelector("span").innerText;
+        tabs.push({ tabName });
+    });
+
+    localStorage.setItem("tabs", JSON.stringify(tabs));
+}
+
+function loadMenusFromLocalStorage(tabName, menuWrapper) {
+    const savedMenus = JSON.parse(localStorage.getItem("tabMenus")) || {};
+    const menus = savedMenus[tabName] || [];
+    menuWrapper.innerHTML = ''; // Nettoyer avant de charger les menus
+
+    menus.forEach(menuName => {
+        const menu = createMenu(menuName, menuWrapper);
+        menuWrapper.appendChild(menu);
+    });
+}
+
+function saveMenusToLocalStorage(tabName, menuWrapper) {
+    if (!(menuWrapper instanceof Element)) {
+        console.error("menuWrapper is not a valid DOM element:", menuWrapper);
+        return;
     }
+
+    const menus = [];
+    menuWrapper.querySelectorAll(".Menu").forEach(menu => {
+        menus.push(menu.innerText);
+    });
+
+    updateTabMenu(tabName, menus);
 }
 
 
@@ -265,23 +321,14 @@ function loadTabsFromLocalStorage(tabsWrapper, contentContainer) {
 
 function createTabs(container) {
     const tabContainer = document.createElement("div");
-    tabContainer.classList.add("TabContainer")
-    tabContainer.style.display = "flex";
-    tabContainer.style.flexGrow = "1";
-    tabContainer.style.position = "fixed";
+    tabContainer.classList.add("TabContainer");
     tabContainer.style.border = "1px solid #FFFFFF";
-    tabContainer.style.height = "100%";
     tabContainer.style.overflowX = "scroll";
-    tabContainer.style.top = "0px";
-    tabContainer.style.left = "0px";
-    tabContainer.style.right = "0px";
 
     const tabsWrapper = document.createElement("div");
-    tabsWrapper.style.display = "flex";
 
     const contentContainer = document.createElement("div"); // Sous-conteneur pour le contenu des onglets
-    contentContainer.classList.add("ContentContainer")
-    contentContainer.style.flexGrow = "1";
+    contentContainer.classList.add("ContentContainer");
     contentContainer.style.width = "100%";
     contentContainer.style.height = "100%";
     contentContainer.style.color = "#ffffff";
@@ -294,7 +341,6 @@ function createTabs(container) {
 
     const createTab = (text = "Annonces listées") => {
         const tab = document.createElement("div");
-        tab.style.display = "flex";
         tab.style.alignItems = "center";
         tab.style.height = "50px";
         tab.style.border = "1px solid #ccc";
@@ -336,12 +382,13 @@ function createTabs(container) {
             contentContainer.innerHTML = ''; 
     
             const contentDiv = document.createElement("div");
+            contentDiv.classList.add("ContentDiv")
             contentDiv.style.color = "#ffffff";
             contentDiv.style.display = "flex";
             contentDiv.style.flexGrow = "1";
             contentDiv.style.width = "100%";
             contentDiv.style.height = "100%";
-            contentDiv.style.backgroundColor = "#333";
+            contentDiv.style.backgroundColor = "#555";
             contentDiv.innerText = `Contenu de l'onglet ${tabContent.innerText}`;
     
             contentContainer.appendChild(contentDiv);
@@ -354,44 +401,34 @@ function createTabs(container) {
         closeButton.style.display = "flex";
         closeButton.style.justifyContent = "center";
         closeButton.style.alignItems = "center";
-        closeButton.style.width = "30px";
-        closeButton.style.height = "30px";
-        closeButton.style.fontSize = "30px";
-        closeButton.style.borderRadius = "50%";
-    
-        closeButton.addEventListener("click", () => {
-            tabsWrapper.removeChild(tab);
-            saveTabsToLocalStorage();
+        closeButton.style.marginLeft = "5px";
+        closeButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            tab.remove();
+            saveTabsToLocalStorage();  // Sauvegarder les onglets après suppression
         });
     
         tab.appendChild(closeButton);
         tabsWrapper.appendChild(tab);
     };
-    
-    
-    const addTabButton = document.createElement("button");
-    addTabButton.innerText = "+";
-    addTabButton.style.padding = "5px 10px";
-    addTabButton.style.height = "50px";
-    addTabButton.style.marginRight = "50px";
-    addTabButton.style.border = "none";
-    addTabButton.style.backgroundColor = "#f0f0f0";
-    addTabButton.style.cursor = "pointer";
 
-    addTabButton.addEventListener("click", () => {
-        createTab("Nouvel onglet");
-        saveTabsToLocalStorage();
-    });
+    // Fonction pour charger les onglets depuis le localStorage
+    const loadTabsFromLocalStorage = () => {
+        const savedTabs = JSON.parse(localStorage.getItem('tabs'));
+        if (savedTabs && savedTabs.length > 0) {
+            savedTabs.forEach(text => createTab(text));
+        } else {
+            createTab();  // Créer un onglet par défaut si aucun onglet n'est trouvé
+        }
+    };
 
-    loadTabsFromLocalStorage();
-
-    tabContainer.appendChild(tabsWrapper);
-    tabContainer.appendChild(addTabButton);
     container.appendChild(tabContainer);
-    container.appendChild(contentContainer);  // Ajout du sous-conteneur pour le contenu
+    tabContainer.appendChild(tabsWrapper);
+    container.appendChild(contentContainer);
+
+    loadTabsFromLocalStorage();  // Charger les onglets lors de l'initialisation
 }
 
-// Fonction GetData mise à jour pour inclure les onglets
 async function GetData(route, container, includeTabs = false) {
     container.innerHTML = '';
 
@@ -535,21 +572,27 @@ function AnnoncesListees() {
     modalList.style.width = "1000px";
     modalList.style.height = "600px";
     modalList.style.border = "1px solid #FFFFFF";
-    modalList.style.borderRadius = "10px";
     modalList.style.backgroundColor = "#000000";
     modalList.style.zIndex = "10";
+    modalList.style.gap = "0px";
     modalList.style.position = "absolute";
     modalList.style.top = "50%";
     modalList.style.left = "50%";
     modalList.style.transform = "translate(-50%, -50%)";
-    modalList.style.display = "none";
+    // =================================
+    // modalList.style.display = "none";
+    modalList.style.display = "flex";
+    // =================================
     modalList.style.flexDirection = "column";  // Organiser le contenu verticalement
 
     // Créer le conteneur pour le contenu des onglets
     const contentContainer = document.createElement("div");
     contentContainer.classList.add("ContentContainer")
     contentContainer.style.overflowY = "scroll";
+    contentContainer.style.position = "relative";
+    contentContainer.style.top = "0px";
     contentContainer.style.color = "#FFFFFF";
+    contentContainer.style.height = "100%";
     contentContainer.style.backgroundColor = "#000000";  // Arrière-plan noir pour le contenu
 
     // Ajouter les onglets et le bouton de fermeture dans la modale
@@ -566,9 +609,11 @@ function AnnoncesListees() {
     boutonAnnoncesList.addEventListener("click", () => {
         modalList.style.display = "flex";
     });
+
 }
 
 function gestionAnnonces() {
     AnnoncesMasquees();
     AnnoncesListees();
+    console.log(getTabsAndMenus())
 }
