@@ -107,6 +107,7 @@ function createMenuBar() {
     return menuBar;
 }
 
+
 function deleteTab(tab, tabsWrapper) {
     const tabName = tab.querySelector("span").innerText;
     
@@ -144,6 +145,7 @@ function createMenu(menuName = "Menu", menuWrapper = null) {
     menu.style.display = "flex";
     menu.style.alignItems = "center";
     menu.style.paddingLeft = "10px";
+    menu.style.backgroundColor = "#000000";  // Couleur par défaut
 
     function enableEditing() {
         const input = document.createElement("input");
@@ -180,12 +182,20 @@ function createMenu(menuName = "Menu", menuWrapper = null) {
         saveMenusToLocalStorage(currentTabName, menuWrapper);
     });
 
-    // ======================================================================
-    // ======================================================================
-    // ======================================================================
-    // ======================================================================
-    // ======================================================================
+    function setActiveMenu(selectedMenu) {
+        const menus = menuWrapper.querySelectorAll(".Menu");
+        menus.forEach(m => {
+            m.style.backgroundColor = "#000000"; 
+            m.classList.remove("active");
+        });
+
+        selectedMenu.style.backgroundColor = "#333";
+        selectedMenu.classList.add("active");
+    }
+
     menu.addEventListener("click", () => {
+        setActiveMenu(menu);
+
         const contentArea = document.querySelector(".MenuContentArea");
         contentArea.innerHTML = '';
 
@@ -194,16 +204,21 @@ function createMenu(menuName = "Menu", menuWrapper = null) {
         annoncesMenu.forEach(annonce => {
             const annonceDiv = document.createElement("div");
             annonceDiv.classList.add("annonce");
-            console.log(annonce);
-            
+
+            const contentMenu = createContentMenu(annonce);
+            annonceDiv.appendChild(contentMenu);
+
+            const deleteButton = contentMenu.querySelector("button");
+            deleteButton.addEventListener("click", () => {
+                const updatedAnnoncesMenu = annoncesMenu.filter(a => a._id !== annonce._id);
+                localStorage.setItem(menuName, JSON.stringify(updatedAnnoncesMenu));
+
+                annonceDiv.remove();
+            });
+
             contentArea.appendChild(annonceDiv);
         });
     });
-    // ======================================================================
-    // ======================================================================
-    // ======================================================================
-    // ======================================================================
-    // ======================================================================
 
     container.appendChild(menu);
     container.appendChild(deleteButton);
@@ -212,17 +227,125 @@ function createMenu(menuName = "Menu", menuWrapper = null) {
 }
 
 
-function createContentMenu() {
+
+function createContentMenu(annonce) {
     const menuContent = document.createElement("div");
     menuContent.classList.add("menuContent");
-    menuContent.innerText = "Contenu";
-    menuContent.style.width = "100%";
-    menuContent.style.height = "100%";
-    menuContent.style.display = "flex";
-    menuContent.style.justifyContent = "center";
-    menuContent.style.alignItems = "center";
     menuContent.style.color = "#FFFFFF";
-    menuContent.style.backgroundColor = "#333";
+    menuContent.style.margin = "20px";
+    menuContent.style.display = "flex";
+    menuContent.style.justifyContent = "start";
+    menuContent.style.alignItems = "start";
+    menuContent.style.gap = "10px";
+    menuContent.style.flexWrap = "wrap";
+    menuContent.style.overflowY = "scroll";
+    menuContent.style.borderRadius = "15px";
+
+    const card = document.createElement("div");
+    card.style.border = "1px solid #FFFFFF";
+    card.style.width = "400px";
+    card.style.height = "400px";
+    card.style.display = "flex";
+    card.style.flexDirection = "column";
+    card.style.borderRadius = "15px";
+    card.style.position = "relative"; // Ajouté pour positionner les éléments de manière absolue à l'intérieur de la carte
+
+    const img = document.createElement("img");
+    img.src = annonce.Image;
+    img.style.width = "100%";
+    img.style.height = "200px";
+    img.style.borderRadius = "15px 15px 0 0"; // Ajouté pour harmoniser avec la carte
+
+    const divPrix = document.createElement("div");
+    divPrix.style.display = "flex"
+    divPrix.style.flexDirection = "row"
+
+    card.appendChild(img);
+    card.appendChild(divPrix);
+
+
+    // Add a delete button
+    const deleteButton = document.createElement("button");
+    deleteButton.innerText = "Supprimer";
+    deleteButton.style.position = "absolute";
+    deleteButton.style.top = "10px"; // Ajuster la hauteur
+    deleteButton.style.right = "10px"; // Positionné à droite
+    deleteButton.style.backgroundColor = "red";
+    deleteButton.style.color = "#FFF";
+    deleteButton.style.border = "none";
+    deleteButton.style.padding = "5px 10px";
+    deleteButton.style.cursor = "pointer";
+    deleteButton.style.borderRadius = "5px"; // Optionnel, pour arrondir le bouton
+    deleteButton.addEventListener("click", () => {
+        // Remove the announcement from local storage
+        const savedAnnounces = JSON.parse(localStorage.getItem(annonce.menuName)) || [];
+        const updatedAnnounces = savedAnnounces.filter(a => a._id !== annonce._id);
+        localStorage.setItem(annonce.menuName, JSON.stringify(updatedAnnounces));
+
+        // Remove the announcement from the UI
+        menuContent.remove();
+    });
+
+    const prix = document.createElement("h2")
+    prix.innerText = annonce.Prix
+
+    divPrix.appendChild(prix)
+
+    const prixAuMCarre = document.createElement("p")
+    prixAuMCarre.style.color = "#444"
+
+    console.log(annonce.ProOuNon === "Pro" ? "VRAI" : "FAUX");
+    
+
+    divPrix.appendChild(prixAuMCarre)
+
+    const aire = document.createElement("div");
+    aire.style.display = "flex"
+    aire.style.justifyContent = "space-between"
+
+    const surface = document.createElement("p");
+    surface.innerText = `Surface : ${annonce.Surface} m²`;
+    surface.innerText = annonce.ProOuNon === "Pro" && annonce.Surface > 0 ? `${annonce.Surface} m² FAI` : 
+    annonce.Surface > 0 ? `${annonce.Surface} m²` : "Non renseigné"
+    surface.style.color = "#444"
+
+    aire.appendChild(surface);
+
+    const nbPieces = document.createElement("p");
+    nbPieces.innerText = annonce.NombreDePieces ? `Nb pieces : ${annonce.NombreDePieces} pieces` : "non défini"
+    nbPieces.style.color = "#444"
+
+    aire.appendChild(surface);
+    aire.appendChild(nbPieces);
+
+    const viewButton = document.createElement("button");
+    viewButton.textContent = "Voir l'annonce";
+    viewButton.style.position = "absolute";
+    viewButton.style.bottom = "0";
+    viewButton.style.left = "0";
+    viewButton.style.right = "0";
+    viewButton.style.padding = "15px";
+    viewButton.style.fontSize = "16px";
+    viewButton.style.color = "#007BFF";
+    viewButton.style.backgroundColor = "#fff";
+    viewButton.style.border = "none";
+    viewButton.style.cursor = "pointer";
+    viewButton.style.width = "100%";
+    viewButton.style.borderBottomLeftRadius = "15px";
+    viewButton.style.borderBottomRightRadius = "15px";
+    viewButton.style.borderTop = "1px solid #ddd";
+
+    viewButton.addEventListener("click", () => {
+        window.open(annonce.LienAnnonce, '_blank'); // Ouvre le lien dans un nouvel onglet
+    });
+
+
+    card.appendChild(viewButton)
+    card.appendChild(aire);
+
+
+    card.appendChild(deleteButton); // Placer le bouton dans la carte pour qu'il se superpose à l'image
+    menuContent.appendChild(card);
 
     return menuContent;
 }
@@ -233,6 +356,7 @@ function createTab(tabsWrapper, contentContainer, tabName) {
         console.error("Nom d'onglet invalide ou déjà existant.");
         return;
     }
+
     const tab = document.createElement("div");
     tab.style.padding = "10px";
     tab.style.backgroundColor = "#000000";
@@ -240,6 +364,9 @@ function createTab(tabsWrapper, contentContainer, tabName) {
     tab.style.cursor = "pointer";
     tab.style.border = "1px solid #ccc";
     tab.style.borderRadius = "4px";
+    
+    // Rendre l'onglet focusable
+    tab.tabIndex = 0;
 
     const tabContent = document.createElement("span");
     tabContent.innerText = tabName;
@@ -288,10 +415,25 @@ function createTab(tabsWrapper, contentContainer, tabName) {
     tab.appendChild(closeButton);
     tabsWrapper.appendChild(tab);
 
-    // Afficher le contenu lié à l'onglet
+    // Gestion des onglets actifs
+    function setActiveTab(selectedTab) {
+        // Réinitialiser tous les onglets
+        Array.from(tabsWrapper.children).forEach(tab => {
+            tab.style.backgroundColor = "#000000"; // Couleur par défaut des onglets
+            tab.classList.remove("active");
+        });
+
+        // Activer l'onglet sélectionné
+        selectedTab.style.backgroundColor = "#333";
+        selectedTab.classList.add("active");
+    }
+
+    // Afficher le contenu lié à l'onglet et définir l'onglet actif
     tab.addEventListener("click", () => {
         currentTabName = tabContent.innerText;
         contentContainer.innerHTML = '';
+
+        setActiveTab(tab); // Définir l'onglet comme actif
 
         const contentDiv = document.createElement("div");
         contentDiv.classList.add("ContentDiv");
@@ -309,8 +451,17 @@ function createTab(tabsWrapper, contentContainer, tabName) {
         contentContainer.appendChild(contentDiv);
     });
 
+    // Rendre le tab "focusable" et détecter la perte de focus
+    tab.addEventListener("blur", () => {
+        if (!tab.classList.contains("active")) {
+            tab.style.backgroundColor = '#000000';
+        }
+    });
+
     saveTabsToLocalStorage(tabsWrapper);
 }
+
+
 
 
 function loadTabsFromLocalStorage(tabsWrapper, contentContainer) {
@@ -359,10 +510,6 @@ function saveMenusToLocalStorage(tabName, menuWrapper) {
 
     updateTabMenu(tabName, menus);
 }
-
-
-
-
 
 function createTabs(container) {
     const tabContainer = document.createElement("div");
@@ -634,10 +781,7 @@ function AnnoncesListees() {
     modalList.style.top = "50%";
     modalList.style.left = "50%";
     modalList.style.transform = "translate(-50%, -50%)";
-    // =================================
-    // modalList.style.display = "none";
-    modalList.style.display = "flex";
-    // =================================
+    modalList.style.display = "none";
     modalList.style.flexDirection = "column";  // Organiser le contenu verticalement
 
     // Créer le conteneur pour le contenu des onglets
