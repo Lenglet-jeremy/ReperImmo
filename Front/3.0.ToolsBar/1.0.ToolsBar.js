@@ -34,10 +34,10 @@ function createTabsAndCloseButton(container, contentContainer) {
     tabContainer.style.alignItems = "center";
     tabContainer.style.justifyContent = "space-between";
     tabContainer.style.height = "50px";
-    tabContainer.style.borderBottom = "1px solid #FFFFFF";
+    tabContainer.style.borderBottom = "1px solid #000000";
     tabContainer.style.padding = "0px 10px";
     tabContainer.style.overflowX = "scroll";
-    tabContainer.style.backgroundColor = "#222"; // Arrière-plan sombre
+    tabContainer.style.backgroundColor = "#FFFFFF"; // Arrière-plan sombre
 
     const tabsWrapper = document.createElement("div");
 
@@ -55,7 +55,7 @@ function createTabsAndCloseButton(container, contentContainer) {
 
     const closeButton = document.createElement("span");
     closeButton.style.cursor = "pointer";
-    closeButton.style.color = "#FFFFFF";
+    closeButton.style.color = "#000000";
     closeButton.innerHTML = "&times;";
     closeButton.style.fontSize = "24px";
     closeButton.style.marginLeft = "10px";
@@ -80,7 +80,7 @@ function createMenuBar() {
     menuBar.style.display = "flex";
     menuBar.style.flexDirection = "column";
     menuBar.style.justifyContent = "space-between";
-    menuBar.style.border = "1px solid #FFFFFF";
+    menuBar.style.border = "1px solid #000000";
 
     const menuWrapper = document.createElement("div");
     menuWrapper.classList.add("MenuWrapper");
@@ -145,7 +145,8 @@ function createMenu(menuName = "Menu", menuWrapper = null) {
     menu.style.display = "flex";
     menu.style.alignItems = "center";
     menu.style.paddingLeft = "10px";
-    menu.style.backgroundColor = "#000000";  // Couleur par défaut
+    menu.style.backgroundColor = "#FFFFFF";
+    menu.style.color = "#000000";
 
     function enableEditing() {
         const input = document.createElement("input");
@@ -185,11 +186,10 @@ function createMenu(menuName = "Menu", menuWrapper = null) {
     function setActiveMenu(selectedMenu) {
         const menus = menuWrapper.querySelectorAll(".Menu");
         menus.forEach(m => {
-            m.style.backgroundColor = "#000000"; 
             m.classList.remove("active");
         });
 
-        selectedMenu.style.backgroundColor = "#333";
+        selectedMenu.style.color = "#00000";
         selectedMenu.classList.add("active");
     }
 
@@ -359,8 +359,8 @@ function createTab(tabsWrapper, contentContainer, tabName) {
 
     const tab = document.createElement("div");
     tab.style.padding = "10px";
-    tab.style.backgroundColor = "#000000";
-    tab.style.color = "#FFFFFF";
+    tab.style.backgroundColor = "#FFFFFF";
+    tab.style.color = "#000000";
     tab.style.cursor = "pointer";
     tab.style.border = "1px solid #ccc";
     tab.style.borderRadius = "4px";
@@ -405,6 +405,7 @@ function createTab(tabsWrapper, contentContainer, tabName) {
     // Fermeture de l'onglet
     const closeButton = document.createElement("span");
     closeButton.innerHTML = "&times;";
+    closeButton.style.color = "#000000";
     closeButton.style.cursor = "pointer";
     closeButton.style.marginLeft = "10px";
     closeButton.addEventListener("click", () => {
@@ -419,12 +420,12 @@ function createTab(tabsWrapper, contentContainer, tabName) {
     function setActiveTab(selectedTab) {
         // Réinitialiser tous les onglets
         Array.from(tabsWrapper.children).forEach(tab => {
-            tab.style.backgroundColor = "#000000"; // Couleur par défaut des onglets
+            tab.style.backgroundColor = "#FFFFFF"; // Couleur par défaut des onglets
             tab.classList.remove("active");
         });
 
         // Activer l'onglet sélectionné
-        selectedTab.style.backgroundColor = "#333";
+        selectedTab.style.backgroundColor = "#CCCCCC";
         selectedTab.classList.add("active");
     }
 
@@ -454,7 +455,7 @@ function createTab(tabsWrapper, contentContainer, tabName) {
     // Rendre le tab "focusable" et détecter la perte de focus
     tab.addEventListener("blur", () => {
         if (!tab.classList.contains("active")) {
-            tab.style.backgroundColor = '#000000';
+            tab.style.backgroundColor = '#FFFFFF';
         }
     });
 
@@ -537,7 +538,7 @@ function createTabs(container) {
         tab.style.height = "50px";
         tab.style.border = "1px solid #ccc";
         tab.style.borderRadius = "4px";
-        tab.style.backgroundColor = "#000000";
+        tab.style.backgroundColor = "#FFFFFF";
         tab.style.cursor = "pointer";
     
         const tabContent = document.createElement("span");
@@ -589,7 +590,7 @@ function createTabs(container) {
         const closeButton = document.createElement("span");
         closeButton.innerHTML = "&times;";
         closeButton.style.cursor = "pointer";
-        closeButton.style.color = "#FFFFFF";
+        closeButton.style.color = "#000000";
         closeButton.style.display = "flex";
         closeButton.style.justifyContent = "center";
         closeButton.style.alignItems = "center";
@@ -626,16 +627,17 @@ async function GetData(route, container, includeTabs = false) {
 
     const closeModalButton = document.createElement("span");
     closeModalButton.style.color = "#FFFFFF";
-    closeModalButton.style.backgroundColor = "#000000";
+    closeModalButton.style.backgroundColor = "#FFFFFF";
     closeModalButton.style.top = "0px";
     closeModalButton.style.right = "0px";
-    closeModalButton.style.width = "50px";
-    closeModalButton.style.height = "50px";
-    closeModalButton.style.border = "1px solid #FFFFFF";
+    closeModalButton.style.width = "40px";
+    closeModalButton.style.height = "40px";
+    closeModalButton.style.border = "1px solid #000000";
     closeModalButton.style.fontSize = "30px";
     closeModalButton.style.position = "absolute";
     closeModalButton.style.textAlign = "center";
     closeModalButton.innerHTML = "&times;";
+    closeModalButton.style.color = "#000000";
     closeModalButton.style.cursor = "pointer";
     closeModalButton.addEventListener("click", () => {
         container.style.display = "none";
@@ -672,9 +674,9 @@ function AnnoncesMasquees() {
 
     modalMasquees.style.width = "1000px";
     modalMasquees.style.height = "600px";
-    modalMasquees.style.border = "1px solid #FFFFFF";
+    modalMasquees.style.border = "1px solid #000000";
     modalMasquees.style.borderRadius = "10px";
-    modalMasquees.style.backgroundColor = "#000000";
+    modalMasquees.style.backgroundColor = "#FFFFFF";
     modalMasquees.style.zIndex = "10";
     modalMasquees.style.position = "absolute";
     modalMasquees.style.top = "50%";
@@ -700,7 +702,7 @@ function AnnoncesMasquees() {
             data.forEach(annonce => {
                 const annonceDiv = document.createElement("div");
                 annonceDiv.classList.add("annonce");
-                annonceDiv.style.backgroundColor = "#000000";
+                annonceDiv.style.backgroundColor = "#FFFFFF";
                 annonceDiv.style.display = "flex";
                 annonceDiv.style.flexDirection = "column";
                 annonceDiv.style.border = "1px solid #ddd";
@@ -767,14 +769,15 @@ function AnnoncesMasquees() {
 
 function AnnoncesListees() {
     const contentDiv = document.querySelector(".ToolsBar");
+    contentDiv.style.borderBottom = "1px solid #FFFFFF"
 
     // Créer la modale globale
     const modalList = document.createElement("div");
     modalList.classList.add("modal-global");
     modalList.style.width = "1000px";
     modalList.style.height = "600px";
-    modalList.style.border = "1px solid #FFFFFF";
-    modalList.style.backgroundColor = "#000000";
+    modalList.style.border = "1px solid #000000";
+    modalList.style.backgroundColor = "#FFFFFF";
     modalList.style.zIndex = "10";
     modalList.style.gap = "0px";
     modalList.style.position = "absolute";
@@ -792,7 +795,7 @@ function AnnoncesListees() {
     contentContainer.style.top = "0px";
     contentContainer.style.color = "#FFFFFF";
     contentContainer.style.height = "100%";
-    contentContainer.style.backgroundColor = "#000000";  // Arrière-plan noir pour le contenu
+    contentContainer.style.backgroundColor = "#FFFFFF";  // Arrière-plan noir pour le contenu
 
     // Ajouter les onglets et le bouton de fermeture dans la modale
     createTabsAndCloseButton(modalList, contentContainer);

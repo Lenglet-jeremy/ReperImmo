@@ -100,6 +100,7 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
 
             let nbAnnonces = 0
             filteredAnnonces.forEach(annonce => {
+                let firstWord = annonce.TypeDeBien.split(" ")[0]; // Redéfinir ici
                 nbAnnonces++
                 
                 let prixAnnonce = annonce.Prix || 0;
@@ -115,7 +116,7 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
 
                     const annonceDiv = document.createElement("div");
                     annonceDiv.classList.add("annonce");
-                    annonceDiv.style.backgroundColor = "#000000";
+                    annonceDiv.style.backgroundColor = "#FFFFFF";
                     annonceDiv.style.display = "flex";
                     annonceDiv.style.flexDirection = "column";
                     annonceDiv.style.border = "1px solid #ddd";
@@ -174,7 +175,7 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                     addButton.style.border = "1px solid #000000";
                     addButton.style.fontSize = "24px";
                     addButton.style.cursor = "pointer";
-                    addButton.style.color = "#FFFFFF";
+                    addButton.style.color = "#000000";
                     addButton.style.width = "30px";
                     addButton.style.height = "30px";
                     addButton.style.borderRadius = "15px";
@@ -247,7 +248,7 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                     const hideButton = document.createElement("span");
                     hideButton.innerHTML = "&times;";
                     hideButton.style.border = "1px solid #000000";
-                    hideButton.style.fontSize = "18px";
+                    hideButton.style.fontSize = "25px";
                     hideButton.style.cursor = "pointer";
                     hideButton.style.width = "30px";
                     hideButton.style.height = "30px";
@@ -345,8 +346,8 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                     dateAddContainer.style.bottom = "60px";
                     dateAddContainer.style.left = "10px";
                     dateAddContainer.style.fontSize = "12px";
-                    dateAddContainer.style.color = "#ffffff";  // Vous pouvez ajuster la couleur selon votre thème
-                    dateAddContainer.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                    dateAddContainer.style.color = "#000000";  // Vous pouvez ajuster la couleur selon votre thème
+                    dateAddContainer.style.backgroundColor = "#FFFFFF";
                     dateAddContainer.style.padding = "5px";
                     dateAddContainer.style.borderRadius = "5px";
 
