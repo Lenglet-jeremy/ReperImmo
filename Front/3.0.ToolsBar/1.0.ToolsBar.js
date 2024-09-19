@@ -232,6 +232,7 @@ function createContentMenu(annonce) {
     const menuContent = document.createElement("div");
     menuContent.classList.add("menuContent");
     menuContent.style.color = "#FFFFFF";
+    menuContent.style.border = "1px solid #000000";
     menuContent.style.margin = "20px";
     menuContent.style.display = "flex";
     menuContent.style.justifyContent = "start";
