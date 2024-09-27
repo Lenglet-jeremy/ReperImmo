@@ -1,3 +1,5 @@
+const { log } = require("console");
+
 function showNotification(message) {
     const notification = document.createElement("div");
     notification.textContent = message;
@@ -41,17 +43,19 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
     fetch(`http://localhost:5000/api/annonces`)
         .then(response => response.json())
         .then(data => {
-            let filteredAnnonces = data.annonces.filter(annonce => {
-                let prixAnnonce = parseFloat(annonce.Prix.replace(/[^\d.-]/g, ''));
-                let surfaceAnnonce = annonce.Surface;
-                let nbPiecesAnnonce = annonce.NombreDePieces;
-                let firstWord = annonce.TypeDeBien.split(" ")[0];
+            let filteredAnnonces = data.annonces.filter(annonce => {                
+            let prixAnnonce = parseFloat((annonce.Prix0).replace(/[^\d.-]/g, ''));
+            let surfaceAnnonce = annonce.Surface;
+            let nbPiecesAnnonce = annonce.NombreDePieces;
+            let firstWord = annonce.TypeDeBien.split(" ")[0];
+            console.log(annonce.Prix0);
+            
 
-                return annonce.toDisplay &&
-                    prixAnnonce >= BudgetMin && prixAnnonce <= BudgetMax &&
-                    surfaceAnnonce >= SurfaceMin && surfaceAnnonce <= SurfaceMax &&
-                    nbPiecesAnnonce >= NbPiecesMin && nbPiecesAnnonce <= NbPiecesMax &&
-                    (categories.length === 0 || categories.includes(firstWord));
+            return annonce.toDisplay &&
+                prixAnnonce >= BudgetMin && prixAnnonce <= BudgetMax &&
+                surfaceAnnonce >= SurfaceMin && surfaceAnnonce <= SurfaceMax &&
+                nbPiecesAnnonce >= NbPiecesMin && nbPiecesAnnonce <= NbPiecesMax &&
+                (categories.length === 0 || categories.includes(firstWord));
             });
 
             // Tri des annonces selon la sélection
@@ -73,8 +77,8 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                 filteredAnnonces.sort((a, b) => b.Surface - a.Surface);
             } else if (sortOrder === "PrixMCarreCroissant" || sortOrder === "PrixMCarreDecroissant") {
                 filteredAnnonces.sort((a, b) => {
-                    let prixM2A = a.scjvemr ? parseFloat(a.scjvemr.replace(/[^\d.-]/g, '')) : 0;
-                    let prixM2B = b.scjvemr ? parseFloat(b.scjvemr.replace(/[^\d.-]/g, '')) : 0;
+                    let prixM2A = a.PrixAuMCarre ? parseFloat(a.PrixAuMCarre.replace(/[^\d.-]/g, '')) : 0;
+                    let prixM2B = b.PrixAuMCarre ? parseFloat(b.PrixAuMCarre.replace(/[^\d.-]/g, '')) : 0;
                     return sortOrder === "PrixMCarreCroissant" ? prixM2A - prixM2B : prixM2B - prixM2A;
                 });
             } else if (sortOrder === "DatesAnciennes" || sortOrder === "DatesRecentes") {
@@ -103,7 +107,7 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                 let firstWord = annonce.TypeDeBien.split(" ")[0]; // Redéfinir ici
                 nbAnnonces++
                 
-                let prixAnnonce = annonce.Prix || 0;
+                let prixAnnonce = annonce.Prix0;
                 let surfaceAnnonce = annonce.Surface;
                 let nbPiecesAnnonce = annonce.NombreDePieces;
 
@@ -130,7 +134,7 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                     annonceDiv.style.position = "relative";
     
                     const img = document.createElement("img");
-                    img.src = annonce.Image;
+                    img.src = annonce.Image0;
                     img.alt = "Image Annonce";
                     img.style.width = "100%";
                     img.style.height = "200px";
@@ -159,10 +163,6 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                     prix.style.fontWeight = "bold";
                     priceContainer.appendChild(prix);
     
-                    const prixAuMCarreDiv = document.createElement("div");
-                    let prixAuMCarre = parseFloat(annonce.scjvemr?.replace(/[^\d.-]/g, '')) || 0;
-                    prixAuMCarreDiv.innerText = prixAuMCarre > 0 ? `${prixAuMCarre} €/m²` : `Non renseigné`;
-                    priceContainer.appendChild(prixAuMCarreDiv);
     
                     rowContainer.appendChild(priceContainer);
     
@@ -305,7 +305,7 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                     textContainer.appendChild(detailsContainer);
 
                     const description = document.createElement("p");
-                    description.textContent = annonce.Description;
+                    description.textContent = annonce.Description0;
                     description.style.margin = "10px 0";
                     description.style.fontSize = "14px";
                     description.style.color = "#666";
