@@ -1,5 +1,3 @@
-const { log } = require("console");
-
 function showNotification(message) {
     const notification = document.createElement("div");
     notification.textContent = message;
@@ -40,6 +38,157 @@ let selectedCategories = [];
 
 
 function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, SurfaceMax = 1000000, NbPiecesMin = 0, NbPiecesMax = 1000, categories = [], sortOrder = 'asc') {
+    fetch(`http://localhost:5000/api/annonces`)
+        .then(response => response.json())
+        .then(data => {
+            let filteredAnnonces = data.annonces.filter(annonce => {                
+                let prixAnnonce = parseFloat((annonce.Prix0).replace(/[^\d.-]/g, ''));
+                let surfaceAnnonce = annonce.Surface;
+                let nbPiecesAnnonce = annonce.NombreDePieces;
+                let firstWord = annonce.TypeDeBien.split(" ")[0];
+                console.log(annonce.Prix0);
+                
+                return annonce.toDisplay &&
+                    prixAnnonce >= BudgetMin && prixAnnonce <= BudgetMax &&
+                    surfaceAnnonce >= SurfaceMin && surfaceAnnonce <= SurfaceMax &&
+                    nbPiecesAnnonce >= NbPiecesMin && nbPiecesAnnonce <= NbPiecesMax &&
+                    (categories.length === 0 || categories.includes(firstWord));
+            });
+
+            // Tri des annonces selon la sélection
+            if (sortOrder === "PrixCroissant") {
+                filteredAnnonces.sort((a, b) => {
+                    let prixA = parseFloat(a.Prix.replace(/[^\d.-]/g, ''));
+                    let prixB = parseFloat(b.Prix.replace(/[^\d.-]/g, ''));
+                    return prixA - prixB;
+                });
+            } else if (sortOrder === "PrixDecroissant") {
+                filteredAnnonces.sort((a, b) => {
+                    let prixA = parseFloat(a.Prix.replace(/[^\d.-]/g, ''));
+                    let prixB = parseFloat(b.Prix.replace(/[^\d.-]/g, ''));
+                    return prixB - prixA;
+                });
+            } else if (sortOrder === "SurfaceCroissante") {
+                filteredAnnonces.sort((a, b) => a.Surface - b.Surface);
+            } else if (sortOrder === "SurfaceDecroissante") {
+                filteredAnnonces.sort((a, b) => b.Surface - a.Surface);
+            } else if (sortOrder === "PrixMCarreCroissant" || sortOrder === "PrixMCarreDecroissant") {
+                filteredAnnonces.sort((a, b) => {
+                    let prixM2A = a.PrixAuMCarre ? parseFloat(a.PrixAuMCarre.replace(/[^\d.-]/g, '')) : 0;
+                    let prixM2B = b.PrixAuMCarre ? parseFloat(b.PrixAuMCarre.replace(/[^\d.-]/g, '')) : 0;
+                    return sortOrder === "PrixMCarreCroissant" ? prixM2A - prixM2B : prixM2B - prixM2A;
+                });
+            } else if (sortOrder === "DatesAnciennes" || sortOrder === "DatesRecentes") {
+                filteredAnnonces.sort((a, b) => {
+                    const dateA = new Date(a.DateAjoutReperimmo);
+                    const dateB = new Date(b.DateAjoutReperimmo);
+                    return sortOrder === "DatesAnciennes" ? dateA - dateB : dateB - dateA;
+                });
+            }
+
+            // Affichage des annonces
+            const contentDiv = document.querySelector(".Content");
+            contentDiv.innerHTML = "";
+            contentDiv.style.display = "flex";
+            contentDiv.style.flexWrap = "wrap";
+            contentDiv.style.justifyContent = "center";
+            contentDiv.style.alignItems = "flex-start";
+            contentDiv.style.overflowY = "scroll";
+            contentDiv.style.height = "calc(100vh - 99px)";
+            contentDiv.style.gap = "20px";
+            contentDiv.style.padding = "20px";
+
+            filteredAnnonces.forEach(annonce => {
+                const annonceDiv = document.createElement("div");
+                annonceDiv.classList.add("annonce-card");
+                annonceDiv.style.border = "1px solid #ccc";
+                annonceDiv.style.padding = "20px";
+                annonceDiv.style.width = "300px";
+                annonceDiv.innerHTML = `
+                    <h3>${annonce.Titre}</h3>
+                    <p>Prix: ${annonce.Prix0}</p>
+                    <p>Surface: ${annonce.Surface} m²</p>
+                    <p>Nombre de pièces: ${annonce.NombreDePieces}</p>
+                    <p>Type de bien: ${annonce.TypeDeBien}</p>
+                `;
+                contentDiv.appendChild(annonceDiv);
+            });
+
+            // Affichage du nombre d'annonces
+            const nombreAnnonces = document.createElement("p");
+            nombreAnnonces.style.width = "100%";
+            nombreAnnonces.innerText = `Nombre d'annonces : ${filteredAnnonces.length}`;
+            contentDiv.prepend(nombreAnnonces);
+        })
+        .catch(error => console.error("Erreur lors du chargement des annonces:", error));
+}
+
+
+function updateSelectedCategories() {
+    selectedCategories = [];
+    document.querySelectorAll("input[name='category']:checked").forEach((checkbox) => {
+        selectedCategories.push(checkbox.value);
+    });
+    loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
+}
+
+function filtres() {
+    let minPriceInput = document.querySelector("#minPrice");
+    let maxPriceInput = document.querySelector("#maxPrice");
+
+    if (minPriceInput && maxPriceInput) {
+        minPriceInput.addEventListener("change", (e) => {
+            minBudget = parseFloat(e.target.value) || 0;
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
+        });
+
+        maxPriceInput.addEventListener("change", (e) => {
+            maxBudget = parseFloat(e.target.value) || 1000000000;
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
+        });
+    }
+
+    let minSurfaceInput = document.querySelector("#minSurface");
+    let maxSurfaceInput = document.querySelector("#maxSurface");
+
+    if (minSurfaceInput && maxSurfaceInput) {
+        minSurfaceInput.addEventListener("change", (e) => {
+            minSurface = parseFloat(e.target.value) || 0;
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
+        });
+
+        maxSurfaceInput.addEventListener("change", (e) => {
+            maxSurface = parseFloat(e.target.value) || 1000000;
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
+        });
+    }
+
+    let minNbPieceInput = document.querySelector("#minNbPiece");
+    let maxNbPieceInput = document.querySelector("#maxNbPiece");
+
+    if (minNbPieceInput && maxNbPieceInput) {
+        minNbPieceInput.addEventListener("change", (e) => {
+            minNbPieces = parseFloat(e.target.value) || 0;
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
+        });
+
+        maxNbPieceInput.addEventListener("change", (e) => {
+            maxNbPieces = parseFloat(e.target.value) || 1000000;
+            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
+        });
+    }
+
+    document.querySelectorAll("input[name='category']").forEach((checkbox) => {
+        checkbox.addEventListener("change", updateSelectedCategories);
+    });
+
+    document.querySelector("#sortOrder").addEventListener("change", (event) => {
+        const selectedSortOrder = event.target.value;
+        loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories, selectedSortOrder);
+    });
+}
+
+function loadAnnoncesBackUp(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, SurfaceMax = 1000000, NbPiecesMin = 0, NbPiecesMax = 1000, categories = [], sortOrder = 'asc') {
     fetch(`http://localhost:5000/api/annonces`)
         .then(response => response.json())
         .then(data => {
@@ -363,68 +512,4 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
             contentDiv.prepend(nombreAnnonces);
         })
         .catch(error => console.error("Erreur lors du chargement des annonces:", error));
-}
-
-function updateSelectedCategories() {
-    selectedCategories = [];
-    document.querySelectorAll("input[name='category']:checked").forEach((checkbox) => {
-        selectedCategories.push(checkbox.value);
-    });
-    loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
-}
-
-function filtres() {
-    let minPriceInput = document.querySelector("#minPrice");
-    let maxPriceInput = document.querySelector("#maxPrice");
-
-    if (minPriceInput && maxPriceInput) {
-        minPriceInput.addEventListener("change", (e) => {
-            minBudget = parseFloat(e.target.value) || 0;
-            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
-        });
-
-        maxPriceInput.addEventListener("change", (e) => {
-            maxBudget = parseFloat(e.target.value) || 1000000000;
-            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
-        });
-    }
-
-    let minSurfaceInput = document.querySelector("#minSurface");
-    let maxSurfaceInput = document.querySelector("#maxSurface");
-
-    if (minSurfaceInput && maxSurfaceInput) {
-        minSurfaceInput.addEventListener("change", (e) => {
-            minSurface = parseFloat(e.target.value) || 0;
-            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
-        });
-
-        maxSurfaceInput.addEventListener("change", (e) => {
-            maxSurface = parseFloat(e.target.value) || 1000000;
-            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
-        });
-    }
-
-    let minNbPieceInput = document.querySelector("#minNbPiece");
-    let maxNbPieceInput = document.querySelector("#maxNbPiece");
-
-    if (minNbPieceInput && maxNbPieceInput) {
-        minNbPieceInput.addEventListener("change", (e) => {
-            minNbPieces = parseFloat(e.target.value) || 0;
-            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
-        });
-
-        maxNbPieceInput.addEventListener("change", (e) => {
-            maxNbPieces = parseFloat(e.target.value) || 1000000;
-            loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories);
-        });
-    }
-
-    document.querySelectorAll("input[name='category']").forEach((checkbox) => {
-        checkbox.addEventListener("change", updateSelectedCategories);
-    });
-
-    document.querySelector("#sortOrder").addEventListener("change", (event) => {
-        const selectedSortOrder = event.target.value;
-        loadAnnonces(minBudget, maxBudget, minSurface, maxSurface, minNbPieces, maxNbPieces, selectedCategories, selectedSortOrder);
-    });
 }
