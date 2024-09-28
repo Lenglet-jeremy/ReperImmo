@@ -186,7 +186,7 @@
                         width: 80px;
                     }
                     p{
-                        margin-left: 5px;
+                        padding-left: 10px;
                         border-left: 1px solid #000000;
                     }
                 }
@@ -219,7 +219,7 @@
                         width: 80px;
                     }
                     p{
-                        margin-left: 5px;
+                        padding-left: 7px;
                         border-left: 1px solid #000000;
                     }
                 }

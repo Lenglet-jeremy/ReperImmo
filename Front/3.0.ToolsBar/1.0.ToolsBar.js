@@ -332,7 +332,7 @@ function createContentMenu(annonce) {
     viewButton.style.width = "100%";
     viewButton.style.borderBottomLeftRadius = "15px";
     viewButton.style.borderBottomRightRadius = "15px";
-    viewButton.style.borderTop = "1px solid #ddd";
+    viewButton.style.borderTop = "1px solid #DDDDDD";
 
     viewButton.addEventListener("click", () => {
         window.open(annonce.LienAnnonce, '_blank'); // Ouvre le lien dans un nouvel onglet
@@ -520,7 +520,7 @@ function createTabs(container) {
     contentContainer.classList.add("ContentContainer");
     contentContainer.style.width = "100%";
     contentContainer.style.height = "100%";
-    contentContainer.style.color = "#ffffff";
+    contentContainer.style.color = "#FFFFFF";
     contentContainer.style.backgroundColor = "#333";
 
     const saveTabsToLocalStorage = () => {
@@ -572,7 +572,7 @@ function createTabs(container) {
     
             const contentDiv = document.createElement("div");
             contentDiv.classList.add("ContentDiv")
-            contentDiv.style.color = "#ffffff";
+            contentDiv.style.color = "#FFFFFF";
             contentDiv.style.display = "flex";
             contentDiv.style.flexGrow = "1";
             contentDiv.style.width = "100%";
@@ -727,7 +727,7 @@ function AnnoncesMasquees() {
                 restoreButton.style.right = "10px";
                 restoreButton.style.padding = "10px 20px";
                 restoreButton.style.backgroundColor = "#00FF00";
-                restoreButton.style.color = "#ffffff";
+                restoreButton.style.color = "#FFFFFF";
                 restoreButton.style.border = "none";
                 restoreButton.style.borderRadius = "4px";
                 restoreButton.style.cursor = "pointer";
@@ -765,7 +765,7 @@ function AnnoncesMasquees() {
 
 function AnnoncesListees() {
     const contentDiv = document.querySelector(".ToolsBar");
-    contentDiv.style.borderBottom = "1px solid #FFFFFF"
+    contentDiv.style.borderBottom = "1px solid #000000"
 
     // Créer la modale globale
     const modalList = document.createElement("div");

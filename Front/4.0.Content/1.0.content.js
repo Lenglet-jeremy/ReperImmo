@@ -96,6 +96,8 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
             contentDiv.style.padding = "20px";
 
             filteredAnnonces.forEach(annonce => {
+                console.log(annonce);
+                
                 const annonceDiv = document.createElement("div");
                 annonceDiv.classList.add("annonce-card");
 
@@ -134,10 +136,15 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                 let priceLine = document.createElement('div');
                 priceLine.style.display = "flex";
                 priceLine.style.justifyContent = "space-between";
+                priceLine.style.padding = "5px 15px";
+                let price = document.createElement('h2');
 
-                let price = document.createElement('p');
-                price.innerHTML = `${annonce.Prix} €`;
+                let prixEntier = parseInt(annonce.Prix.replace('€', '').trim());
+                let prixFormate = prixEntier.toLocaleString('fr-FR');
+                
+                price.innerHTML = `${prixFormate} €`;
                 price.style.color = "#000000";
+                
 
                 let buttonContainer = document.createElement('div');
                 buttonContainer.style.display = "flex";
@@ -159,9 +166,6 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                 closeButton.style.borderRadius = "5px";
                 closeButton.style.padding = "5px";
 
-                buttonContainer.appendChild(plusButton);
-                buttonContainer.appendChild(closeButton);
-
                 priceLine.appendChild(price);
                 priceLine.appendChild(buttonContainer);
 
@@ -169,6 +173,7 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                 let detailsLine = document.createElement('div');
                 detailsLine.style.display = "flex";
                 detailsLine.style.justifyContent = "space-between";
+                detailsLine.style.padding = "5px 15px";
 
                 let surface = document.createElement('p');
                 surface.innerHTML = `${annonce.Surface}`;
@@ -181,17 +186,49 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                 detailsLine.appendChild(surface);
                 detailsLine.appendChild(rooms);
 
-                // Troisième ligne : Type de bien
-                let typeLine = document.createElement('p');
-                typeLine.textContent = annonce.TypeDeBien;
-                typeLine.style.fontSize = "18px";
-                typeLine.style.color = "#333";
-                typeLine.style.marginBottom = "10px";
+                // Troisième ligne : Conteneur pour Type de bien et DateAjoutReperImmo
+                let typeLineContainer = document.createElement('div');
+                typeLineContainer.style.display = "flex";
+                typeLineContainer.style.justifyContent = "space-between";
+                typeLineContainer.style.alignItems = "center"; // Pour centrer verticalement
+                typeLineContainer.style.padding = "5px 15px";
+
+                // Élément pour le type de bien
+                let typeDeBien = document.createElement('p');
+                typeDeBien.textContent = annonce.TypeDeBien;
+                typeDeBien.style.fontSize = "18px";
+                typeDeBien.style.color = "#333";
+                typeDeBien.style.marginBottom = "10px";
+
+                // Élément pour la date d'ajout
+                let dateAjout = document.createElement('p');
+                dateAjout.textContent = `Ajouté le ${new Date(annonce.DateAjoutReperImmo).toLocaleDateString('fr-FR')}`;
+                dateAjout.style.fontSize = "14px";
+                dateAjout.style.color = "#666";
+                dateAjout.style.marginBottom = "10px";
+
+                // Ajout des éléments dans le conteneur
+                typeLineContainer.appendChild(typeDeBien);
+                typeLineContainer.appendChild(dateAjout);
 
                 // Ajout des éléments texte au conteneur
                 textContainer.appendChild(priceLine);
                 textContainer.appendChild(detailsLine);
-                textContainer.appendChild(typeLine);
+                textContainer.appendChild(typeLineContainer);
+
+                let viewButton = document.createElement("button");
+                viewButton.innerText = "Voir l'annonce";
+                viewButton.style.border = "None"
+                viewButton.style.height = "40px"
+                viewButton.style.backgroundColor = "#0000FF"
+                viewButton.style.color = "#fff"
+
+                // Ajout d'un événement de clic pour rediriger vers le lien de l'annonce
+                viewButton.addEventListener('click', () => {
+                    window.open(annonce.LienAnnonce, '_blank');
+                });
+
+                textContainer.append(viewButton)
 
                 // Ajout du conteneur texte à l'annonceDiv
                 annonceDiv.appendChild(textContainer);
@@ -212,7 +249,6 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
         })
         .catch(error => console.error("Erreur lors du chargement des annonces:", error));
 }
-
 
 
 function updateSelectedCategories() {

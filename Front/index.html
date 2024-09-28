@@ -8,12 +8,11 @@
     <link rel="stylesheet" href="./2.0.toolsMenu/1.0.toolsMenu.css">
     <link rel="stylesheet" href="./3.0.toolsBar/1.0.toolsBar.css">
     <link rel="stylesheet" href="./4.0.content/1.0.content.css">
-    <title>Document</title>
+    <title>ReperImmo</title>
 </head>
 <body>
     <div class="ReperImmoPage">
         <div class="ReperImmoArea">
-            
             <div id="sidebar"></div>
             <div id="toolsMenu"></div>
 
@@ -26,20 +25,28 @@
         </div>
     </div>
 
-
+    <!-- Charge l'ensemble des fonction JS -->
     <script src="./2.0.ToolsMenu/1.0.ToolsMenu.js"></script>
     <script src="./3.0.ToolsBar/1.0.ToolsBar.js"></script>
     <script src="./4.0.content/1.0.content.js"></script>
 
     <script>loadAnnonces()</script>
+
+    <!-- Lorsque le DOM est complètement chargé, les différentes parties HTML sont injectées dans la page -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             loadPartial('sidebar', './1.0.sideBar/1.0.sideBar.html');
+
+            // Injection de toolsMenu.html dans la div toolsMenu plus haut
+            // Et met à disposition le contenu de toolsMEnu dans la fonction filtre dans le fichier content.js
             loadPartial('toolsMenu', './2.0.toolsMenu/1.0.toolsMenu.html', filtres);
+
+            // Même logique
             loadPartial('toolsBar', './3.0.toolsBar/1.0.toolsBar.html', gestionAnnonces);
+
             loadPartial('content', './4.0.content/1.0.content.html');
         });
-        
+
         function loadPartial(id, url, callback) {
             fetch(url)
                 .then(response => response.text())
