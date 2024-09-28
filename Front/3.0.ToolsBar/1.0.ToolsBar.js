@@ -226,8 +226,6 @@ function createMenu(menuName = "Menu", menuWrapper = null) {
     return container;
 }
 
-
-
 function createContentMenu(annonce) {
     const menuContent = document.createElement("div");
     menuContent.classList.add("menuContent");
@@ -462,9 +460,6 @@ function createTab(tabsWrapper, contentContainer, tabName) {
 
     saveTabsToLocalStorage(tabsWrapper);
 }
-
-
-
 
 function loadTabsFromLocalStorage(tabsWrapper, contentContainer) {
     const savedTabs = JSON.parse(localStorage.getItem("tabs")) || [];
