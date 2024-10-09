@@ -37,18 +37,21 @@ let maxNbPieces = 1000000;
 let selectedCategories = [];
 
 
-function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, SurfaceMax = 1000000, NbPiecesMin = 0, NbPiecesMax = 1000, categories = [], sortOrder = 'asc') {
+function loadAnnonces(BudgetMin = 0, BudgetMax = Infinity, SurfaceMin = 0, SurfaceMax = Infinity, NbPiecesMin = 0, NbPiecesMax = Infinity, categories = [], sortOrder = 'asc') {
     fetch(`http://localhost:5000/api/annonces`)
 
         .then(response => response.json())
         .then(data => {
             let annoncesMasquees = JSON.parse(localStorage.getItem('annoncesMasquees')) || [];
-
-            let filteredAnnonces = data.annonces.filter(annonce => {                
+        
+            
+            let filteredAnnonces = data.annonces.filter(annonce => {
                 let prixAnnonce = annonce.Prix;
-                let surfaceAnnonce = parseFloat(annonce.Surface.replace('m²', '')); 
-                let nbPiecesAnnonce = parseInt(annonce.NombreDePieces); 
-                let firstWord = annonce.TypeDeBien.split(" ")[0];
+                let surfaceAnnonce = annonce.Surface;
+                let nbPiecesAnnonce = annonce.NombreDePieces;
+                let firstWord = annonce.TypeDeBien;
+                let pro = annonce.Pro;
+                
 
                 // Filtrer les annonces masquées
                 return annonce.ToDisplay &&
@@ -56,26 +59,22 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                     surfaceAnnonce >= SurfaceMin && surfaceAnnonce <= SurfaceMax &&
                     nbPiecesAnnonce >= NbPiecesMin && nbPiecesAnnonce <= NbPiecesMax &&
                     (categories.length === 0 || categories.includes(firstWord)) &&
-                    !annoncesMasquees.includes(annonce.id);  // Exclure les annonces masquées
-            });
+                    !annoncesMasquees.includes(annonce.id);
+            }); // Jouer avec les filtre pour afficher toutes les annon de base mais sans casser le filtre
 
-            // Tri des annonces selon la sélection
-            if (sortOrder === "PrixCroissant") {
+            // Ajout du tri par prix au m²
+            if (sortOrder === "PrixMCarreCroissant") {
+                filteredAnnonces.sort((a, b) => a.PrixAuMCarre - b.PrixAuMCarre);
+            } else if (sortOrder === "PrixMCarreDecroissant") {
+                filteredAnnonces.sort((a, b) => b.PrixAuMCarre - a.PrixAuMCarre);
+            } else if (sortOrder === "PrixCroissant") {
                 filteredAnnonces.sort((a, b) => a.Prix - b.Prix);
             } else if (sortOrder === "PrixDecroissant") {
                 filteredAnnonces.sort((a, b) => b.Prix - a.Prix);
             } else if (sortOrder === "SurfaceCroissante") {
-                filteredAnnonces.sort((a, b) => {
-                    let surfaceA = parseFloat(a.Surface.replace('m²', ''));
-                    let surfaceB = parseFloat(b.Surface.replace('m²', ''));
-                    return surfaceA - surfaceB;
-                });
+                filteredAnnonces.sort((a, b) => a.Surface - b.Surface);
             } else if (sortOrder === "SurfaceDecroissante") {
-                filteredAnnonces.sort((a, b) => {
-                    let surfaceA = parseFloat(a.Surface.replace('m²', ''));
-                    let surfaceB = parseFloat(b.Surface.replace('m²', ''));
-                    return surfaceB - surfaceA;
-                });
+                filteredAnnonces.sort((a, b) => b.Surface - a.Surface);
             } else if (sortOrder === "DatesAnciennes" || sortOrder === "DatesRecentes") {
                 filteredAnnonces.sort((a, b) => {
                     const dateA = new Date(a.DateAjoutReperImmo);
@@ -97,12 +96,11 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
             contentDiv.style.padding = "20px";
 
             filteredAnnonces.forEach(annonce => {
-                console.log(annonce);
+                
                 
                 const annonceDiv = document.createElement("div");
                 annonceDiv.classList.add("annonce-card");
 
-                // Ajout de style pour chaque annonce
                 annonceDiv.style.border = "1px solid #ddd";
                 annonceDiv.style.borderRadius = "10px";
                 annonceDiv.style.overflow = "hidden";
@@ -113,123 +111,122 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
                 annonceDiv.style.display = "flex";
                 annonceDiv.style.flexDirection = "column";
 
-
                 // Création de l'image
-                let image = document.createElement('img');
+                const image = document.createElement('img');
                 image.src = annonce.Image;
                 image.alt = "Image de l'annonce";
                 image.style.width = "100%";
                 image.style.height = "180px";
                 image.style.objectFit = "cover";
                 image.style.borderBottom = "1px solid #ddd";
-
-                // Ajout de l'image à l'annonceDiv
                 annonceDiv.appendChild(image);
 
-                // Création du conteneur pour le texte
-                let textContainer = document.createElement('div');
+                // Conteneur texte
+                const textContainer = document.createElement('div');
                 textContainer.style.flexGrow = "1";
                 textContainer.style.display = "flex";
                 textContainer.style.flexDirection = "column";
                 textContainer.style.justifyContent = "space-between";
 
-                // Première ligne : Prix + boutons
-                let priceLine = document.createElement('div');
+                // Prix et boutons
+                const priceLine = document.createElement('div');
                 priceLine.style.display = "flex";
-                priceLine.style.justifyContent = "space-between";
-                priceLine.style.padding = "5px 15px";
-                let price = document.createElement('h2');
+                priceLine.style.padding = "5px";
 
-                let prixEntier = parseInt(annonce.Prix.replace('€', '').trim());
-                let prixFormate = prixEntier.toLocaleString('fr-FR');
-                
-                price.innerHTML = `${prixFormate} €`;
+                // Prix principal
+                const price = document.createElement('h2');
+                price.innerHTML = `${Number(annonce.Prix).toLocaleString('fr-FR')} €`;
                 price.style.color = "#000000";
-                
+                price.style.margin = "0";  // Pour éviter tout margin par défaut
 
-                let buttonContainer = document.createElement('div');
-                buttonContainer.style.display = "flex";
-                buttonContainer.style.gap = "10px";
+                // Conteneur pour le prix au m² et "FAI"
+                const pricePerSquareMeterContainer = document.createElement('div');
+                pricePerSquareMeterContainer.style.display = "flex";
+                pricePerSquareMeterContainer.style.alignItems = "center";
+                pricePerSquareMeterContainer.style.gap = "5px";  // Espace entre prix et FAI
 
-                let plusButton = document.createElement('button');
-                plusButton.textContent = "+";
-                plusButton.style.backgroundColor = "#28a745"; 
-                plusButton.style.color = "#fff"; 
-                plusButton.style.border = "none";
-                plusButton.style.borderRadius = "5px";
-                plusButton.style.padding = "5px";
+                // Prix au mètre carré
+                const pricePerSquareMeter = document.createElement('p');
+                pricePerSquareMeter.innerHTML = `${Number(annonce.PrixAuMCarre).toLocaleString('fr-FR')} €/m²`;
+                pricePerSquareMeter.style.fontSize = "0.8em";  // Plus petit que le prix principal
+                pricePerSquareMeter.style.color = "#666";
 
-                let closeButton = document.createElement('button');
-                closeButton.textContent = "X";
-                closeButton.style.backgroundColor = "#dc3545";
-                closeButton.style.color = "#fff";
-                closeButton.style.border = "none";
-                closeButton.style.borderRadius = "5px";
-                closeButton.style.padding = "5px";
+                // Mention FAI si Pro === true
+                if (annonce.Pro === true) {
+                    const faiElement = document.createElement('span');
+                    faiElement.innerHTML = "FAI";
+                    faiElement.style.fontSize = "0.8em";
+                    faiElement.style.color = "#666";
+                    pricePerSquareMeterContainer.appendChild(pricePerSquareMeter);
+                    pricePerSquareMeterContainer.appendChild(faiElement);
+                } else {
+                    pricePerSquareMeterContainer.appendChild(pricePerSquareMeter);
+                }
 
+                // Appliquer un style "flex" aligné à gauche
+                priceLine.style.display = "flex";
+                priceLine.style.alignItems = "center";  // Aligner verticalement au centre
+                priceLine.style.gap = "5px";  // Ajouter un petit espace entre le prix et le prix au m²
+
+                // Ajouter les deux éléments dans priceLine
                 priceLine.appendChild(price);
-                priceLine.appendChild(buttonContainer);
+                priceLine.appendChild(pricePerSquareMeterContainer);
 
-                // Deuxième ligne : Surface + Nombre de pièces
-                let detailsLine = document.createElement('div');
+
+
+                // Surface et nombre de pièces
+                const detailsLine = document.createElement('div');
                 detailsLine.style.display = "flex";
                 detailsLine.style.justifyContent = "space-between";
                 detailsLine.style.padding = "5px 15px";
 
-                let surface = document.createElement('p');
-                surface.innerHTML = `${annonce.Surface}`;
+                const surface = document.createElement('p');
+                surface.innerHTML = `${annonce.Surface} m²`;
                 surface.style.color = "#666";
 
-                let rooms = document.createElement('p');
-                rooms.innerHTML = `${annonce.NombreDePieces}`;
+                const rooms = document.createElement('p');
+                rooms.innerHTML = `${annonce.NombreDePieces} pièces`;
                 rooms.style.color = "#666";
 
                 detailsLine.appendChild(surface);
                 detailsLine.appendChild(rooms);
 
-                // Troisième ligne : Conteneur pour Type de bien et DateAjoutReperImmo
-                let typeLineContainer = document.createElement('div');
+                // Type de bien et date
+                const typeLineContainer = document.createElement('div');
                 typeLineContainer.style.display = "flex";
                 typeLineContainer.style.justifyContent = "space-between";
-                typeLineContainer.style.alignItems = "center"; // Pour centrer verticalement
                 typeLineContainer.style.padding = "5px 15px";
 
-                // Élément pour le type de bien
-                let typeDeBien = document.createElement('p');
+                const typeDeBien = document.createElement('p');
                 typeDeBien.textContent = annonce.TypeDeBien;
                 typeDeBien.style.fontSize = "18px";
                 typeDeBien.style.color = "#333";
-                typeDeBien.style.marginBottom = "10px";
 
-                // Élément pour la date d'ajout
-                let dateAjout = document.createElement('p');
+                const dateAjout = document.createElement('p');
                 dateAjout.textContent = `Ajouté le ${new Date(annonce.DateAjoutReperImmo).toLocaleDateString('fr-FR')}`;
                 dateAjout.style.fontSize = "14px";
                 dateAjout.style.color = "#666";
-                dateAjout.style.marginBottom = "10px";
 
-                // Ajout des éléments dans le conteneur
                 typeLineContainer.appendChild(typeDeBien);
                 typeLineContainer.appendChild(dateAjout);
 
-                // Ajout des éléments texte au conteneur
                 textContainer.appendChild(priceLine);
                 textContainer.appendChild(detailsLine);
                 textContainer.appendChild(typeLineContainer);
 
-                let viewButton = document.createElement("button");
+                // Bouton pour voir l'annonce
+                const viewButton = document.createElement("button");
                 viewButton.innerText = "Voir l'annonce";
-                viewButton.style.border = "None"
-                viewButton.style.height = "40px"
-                viewButton.style.backgroundColor = "#0000FF"
-                viewButton.style.color = "#fff"
+                viewButton.style.border = "None";
+                viewButton.style.height = "40px";
+                viewButton.style.backgroundColor = "#0000FF";
+                viewButton.style.color = "#fff";
 
-                // Ajout d'un événement de clic pour rediriger vers le lien de l'annonce
                 viewButton.addEventListener('click', () => {
                     window.open(annonce.LienAnnonce, '_blank');
                 });
 
-                textContainer.append(viewButton)
+                textContainer.appendChild(viewButton);
 
                 // Ajout du conteneur texte à l'annonceDiv
                 annonceDiv.appendChild(textContainer);
@@ -250,6 +247,7 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, Sur
         })
         .catch(error => console.error("Erreur lors du chargement des annonces:", error));
 }
+
 
 
 function updateSelectedCategories() {

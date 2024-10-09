@@ -27,6 +27,8 @@ function updateTabMenu(tabName, updatedMenus) {
     localStorage.setItem('tabMenus', JSON.stringify(savedMenus));
 }
 
+
+
 function createTabsAndCloseButton(container, contentContainer) {
     const tabContainer = document.createElement("div");
     tabContainer.classList.add("TabContainer");
@@ -72,6 +74,245 @@ function createTabsAndCloseButton(container, contentContainer) {
     loadTabsFromLocalStorage(tabsWrapper, contentContainer);
 }
 
+function createTabs(container) {
+    const tabContainer = document.createElement("div");
+    tabContainer.classList.add("TabContainer");
+    tabContainer.style.border = "1px solid #FFFFFF";
+    tabContainer.style.overflowX = "scroll";
+
+    const tabsWrapper = document.createElement("div");
+
+    const contentContainer = document.createElement("div"); // Sous-conteneur pour le contenu des onglets
+    contentContainer.classList.add("ContentContainer");
+    contentContainer.style.width = "100%";
+    contentContainer.style.height = "100%";
+    contentContainer.style.color = "#FFFFFF";
+    contentContainer.style.backgroundColor = "#333";
+
+    const saveTabsToLocalStorage = () => {
+        const tabTexts = Array.from(tabsWrapper.children).map(tab => tab.querySelector('span').innerText);
+        localStorage.setItem('tabs', JSON.stringify(tabTexts));
+    };
+
+    const createTab = (text = "Annonces listées") => {
+        const tab = document.createElement("div");
+        tab.style.alignItems = "center";
+        tab.style.height = "50px";
+        tab.style.border = "1px solid #ccc";
+        tab.style.borderRadius = "4px";
+        tab.style.backgroundColor = "#FFFFFF";
+        tab.style.cursor = "pointer";
+    
+        const tabContent = document.createElement("span");
+        tabContent.style.flexGrow = "1";
+        tabContent.innerText = text;
+        tab.appendChild(tabContent);
+    
+        // Ajout du double-clic pour éditer le nom de l'onglet
+        tabContent.addEventListener("dblclick", () => {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.value = tabContent.innerText;
+            input.style.flexGrow = "1";
+    
+            // Lorsque l'utilisateur termine l'édition (perte de focus ou touche Entrée)
+            input.addEventListener("blur", () => {
+                tabContent.innerText = input.value;
+                tab.replaceChild(tabContent, input);  // Remplacer le champ de texte par le texte mis à jour
+                saveTabsToLocalStorage();  // Sauvegarder les nouveaux noms des onglets
+            });
+    
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    input.blur();  // Simuler la perte de focus lorsque l'utilisateur appuie sur Entrée
+                }
+            });
+    
+            tab.replaceChild(input, tabContent);  // Remplacer le texte par un champ de texte
+            input.focus();  // Mettre le focus sur le champ pour que l'utilisateur puisse immédiatement commencer à taper
+        });
+    
+        tab.addEventListener("click", () => {
+            // Vider uniquement le sous-conteneur de contenu (et non l'ensemble du container)
+            contentContainer.innerHTML = ''; 
+    
+            const contentDiv = document.createElement("div");
+            contentDiv.classList.add("ContentDiv")
+            contentDiv.style.color = "#FFFFFF";
+            contentDiv.style.display = "flex";
+            contentDiv.style.flexGrow = "1";
+            contentDiv.style.width = "100%";
+            contentDiv.style.height = "100%";
+            contentDiv.style.backgroundColor = "#555";
+            contentDiv.innerText = `Contenu de l'onglet ${tabContent.innerText}`;
+    
+            contentContainer.appendChild(contentDiv);
+        });
+    
+        const closeButton = document.createElement("span");
+        closeButton.innerHTML = "&times;";
+        closeButton.style.cursor = "pointer";
+        closeButton.style.color = "#000000";
+        closeButton.style.display = "flex";
+        closeButton.style.justifyContent = "center";
+        closeButton.style.alignItems = "center";
+        closeButton.style.marginLeft = "5px";
+        closeButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            tab.remove();
+            saveTabsToLocalStorage();  // Sauvegarder les onglets après suppression
+        });
+    
+        tab.appendChild(closeButton);
+        tabsWrapper.appendChild(tab);
+    };
+
+    // Fonction pour charger les onglets depuis le localStorage
+    const loadTabsFromLocalStorage = () => {
+        const savedTabs = JSON.parse(localStorage.getItem('tabs'));
+        if (savedTabs && savedTabs.length > 0) {
+            savedTabs.forEach(text => createTab(text));
+        } else {
+            createTab();  // Créer un onglet par défaut si aucun onglet n'est trouvé
+        }
+    };
+
+    container.appendChild(tabContainer);
+    tabContainer.appendChild(tabsWrapper);
+    container.appendChild(contentContainer);
+
+    loadTabsFromLocalStorage();  // Charger les onglets lors de l'initialisation
+}
+
+function createTab(tabsWrapper, contentContainer, tabName) {
+
+    if (!tabName || Array.from(tabsWrapper.children).some(tab => tab.innerText === tabName)) {
+        console.error("Nom d'onglet invalide ou déjà existant.");
+        return;
+    }
+
+    const tab = document.createElement("div");
+    tab.style.padding = "10px";
+    tab.style.backgroundColor = "#FFFFFF";
+    tab.style.color = "#000000";
+    tab.style.cursor = "pointer";
+    tab.style.border = "1px solid #ccc";
+    tab.style.borderRadius = "4px";
+    
+    // Rendre l'onglet focusable
+    tab.tabIndex = 0;
+
+    const tabContent = document.createElement("span");
+    tabContent.innerText = tabName;
+    tab.appendChild(tabContent);
+
+    const menuContentArea = document.createElement("div");
+    menuContentArea.classList.add("MenuContentArea");
+    menuContentArea.style.flexGrow = "1";
+    menuContentArea.style.width = "100%";
+    menuContentArea.style.height = "100%";
+
+    // Renommer l'onglet
+    tabContent.addEventListener("dblclick", () => {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = tabContent.innerText;
+        input.style.width = "100px"; // Largeur du champ de texte
+        tab.replaceChild(input, tabContent);
+
+        const saveTabName = () => {
+            tabContent.innerText = input.value;
+            tab.replaceChild(tabContent, input);
+            saveTabsToLocalStorage(tabsWrapper);
+        };
+
+        input.addEventListener("blur", saveTabName);
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                saveTabName();
+            }
+        });
+
+        input.focus();
+    });
+
+    // Fermeture de l'onglet
+    const closeButton = document.createElement("span");
+    closeButton.innerHTML = "&times;";
+    closeButton.style.color = "#000000";
+    closeButton.style.cursor = "pointer";
+    closeButton.style.marginLeft = "10px";
+    closeButton.addEventListener("click", () => {
+        tabsWrapper.removeChild(tab);
+        saveTabsToLocalStorage(tabsWrapper);
+    });
+
+    tab.appendChild(closeButton);
+    tabsWrapper.appendChild(tab);
+
+    // Gestion des onglets actifs
+    function setActiveTab(selectedTab) {
+        // Réinitialiser tous les onglets
+        Array.from(tabsWrapper.children).forEach(tab => {
+            tab.style.backgroundColor = "#FFFFFF"; // Couleur par défaut des onglets
+            tab.classList.remove("active");
+        });
+
+        // Activer l'onglet sélectionné
+        selectedTab.style.backgroundColor = "#CCCCCC";
+        selectedTab.classList.add("active");
+    }
+
+    // Afficher le contenu lié à l'onglet et définir l'onglet actif
+    tab.addEventListener("click", () => {
+        currentTabName = tabContent.innerText;
+        contentContainer.innerHTML = '';
+
+        setActiveTab(tab); // Définir l'onglet comme actif
+
+        const contentDiv = document.createElement("div");
+        contentDiv.classList.add("ContentDiv");
+        contentDiv.style.gap = "0px";
+        contentDiv.style.width = "100%";
+
+        const menuBar = createMenuBar(); // Appeler createMenuBar sans paramètres car currentTabName est mis à jour
+        const menuContentArea = document.createElement("div");
+        menuContentArea.classList.add("MenuContentArea");
+        menuContentArea.style.width = "100%";
+
+        contentDiv.appendChild(menuBar);
+        contentDiv.appendChild(menuContentArea);
+
+        contentContainer.appendChild(contentDiv);
+    });
+
+    // Rendre le tab "focusable" et détecter la perte de focus
+    tab.addEventListener("blur", () => {
+        if (!tab.classList.contains("active")) {
+            tab.style.backgroundColor = '#FFFFFF';
+        }
+    });
+
+    saveTabsToLocalStorage(tabsWrapper);
+}
+
+function deleteTab(tab, tabsWrapper) {
+    const tabName = tab.querySelector("span").innerText;
+    
+    // Suppression de l'onglet
+    tabsWrapper.removeChild(tab);
+
+    // Supprimer les menus de cet onglet dans localStorage
+    const savedMenus = JSON.parse(localStorage.getItem('tabMenus')) || {};
+    delete savedMenus[tabName];
+    localStorage.setItem('tabMenus', JSON.stringify(savedMenus));
+
+    // Sauvegarder les onglets restants
+    saveTabsToLocalStorage(tabsWrapper);
+}
+
+
+
 function createMenuBar() {
     const menuBar = document.createElement("div");
     menuBar.classList.add("MenuBar");
@@ -106,23 +347,6 @@ function createMenuBar() {
 
     return menuBar;
 }
-
-
-function deleteTab(tab, tabsWrapper) {
-    const tabName = tab.querySelector("span").innerText;
-    
-    // Suppression de l'onglet
-    tabsWrapper.removeChild(tab);
-
-    // Supprimer les menus de cet onglet dans localStorage
-    const savedMenus = JSON.parse(localStorage.getItem('tabMenus')) || {};
-    delete savedMenus[tabName];
-    localStorage.setItem('tabMenus', JSON.stringify(savedMenus));
-
-    // Sauvegarder les onglets restants
-    saveTabsToLocalStorage(tabsWrapper);
-}
-
 
 function createMenu(menuName = "Menu", menuWrapper = null) {
     // Si aucun menuWrapper n'est fourni, on prend celui de l'onglet actuel
@@ -349,124 +573,7 @@ function createContentMenu(annonce) {
     return menuContent;
 }
 
-function createTab(tabsWrapper, contentContainer, tabName) {
 
-    if (!tabName || Array.from(tabsWrapper.children).some(tab => tab.innerText === tabName)) {
-        console.error("Nom d'onglet invalide ou déjà existant.");
-        return;
-    }
-
-    const tab = document.createElement("div");
-    tab.style.padding = "10px";
-    tab.style.backgroundColor = "#FFFFFF";
-    tab.style.color = "#000000";
-    tab.style.cursor = "pointer";
-    tab.style.border = "1px solid #ccc";
-    tab.style.borderRadius = "4px";
-    
-    // Rendre l'onglet focusable
-    tab.tabIndex = 0;
-
-    const tabContent = document.createElement("span");
-    tabContent.innerText = tabName;
-    tab.appendChild(tabContent);
-
-    const menuContentArea = document.createElement("div");
-    menuContentArea.classList.add("MenuContentArea");
-    menuContentArea.style.flexGrow = "1";
-    menuContentArea.style.width = "100%";
-    menuContentArea.style.height = "100%";
-
-    // Renommer l'onglet
-    tabContent.addEventListener("dblclick", () => {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.value = tabContent.innerText;
-        input.style.width = "100px"; // Largeur du champ de texte
-        tab.replaceChild(input, tabContent);
-
-        const saveTabName = () => {
-            tabContent.innerText = input.value;
-            tab.replaceChild(tabContent, input);
-            saveTabsToLocalStorage(tabsWrapper);
-        };
-
-        input.addEventListener("blur", saveTabName);
-        input.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                saveTabName();
-            }
-        });
-
-        input.focus();
-    });
-
-    // Fermeture de l'onglet
-    const closeButton = document.createElement("span");
-    closeButton.innerHTML = "&times;";
-    closeButton.style.color = "#000000";
-    closeButton.style.cursor = "pointer";
-    closeButton.style.marginLeft = "10px";
-    closeButton.addEventListener("click", () => {
-        tabsWrapper.removeChild(tab);
-        saveTabsToLocalStorage(tabsWrapper);
-    });
-
-    tab.appendChild(closeButton);
-    tabsWrapper.appendChild(tab);
-
-    // Gestion des onglets actifs
-    function setActiveTab(selectedTab) {
-        // Réinitialiser tous les onglets
-        Array.from(tabsWrapper.children).forEach(tab => {
-            tab.style.backgroundColor = "#FFFFFF"; // Couleur par défaut des onglets
-            tab.classList.remove("active");
-        });
-
-        // Activer l'onglet sélectionné
-        selectedTab.style.backgroundColor = "#CCCCCC";
-        selectedTab.classList.add("active");
-    }
-
-    // Afficher le contenu lié à l'onglet et définir l'onglet actif
-    tab.addEventListener("click", () => {
-        currentTabName = tabContent.innerText;
-        contentContainer.innerHTML = '';
-
-        setActiveTab(tab); // Définir l'onglet comme actif
-
-        const contentDiv = document.createElement("div");
-        contentDiv.classList.add("ContentDiv");
-        contentDiv.style.gap = "0px";
-        contentDiv.style.width = "100%";
-
-        const menuBar = createMenuBar(); // Appeler createMenuBar sans paramètres car currentTabName est mis à jour
-        const menuContentArea = document.createElement("div");
-        menuContentArea.classList.add("MenuContentArea");
-        menuContentArea.style.width = "100%";
-
-        contentDiv.appendChild(menuBar);
-        contentDiv.appendChild(menuContentArea);
-
-        contentContainer.appendChild(contentDiv);
-    });
-
-    // Rendre le tab "focusable" et détecter la perte de focus
-    tab.addEventListener("blur", () => {
-        if (!tab.classList.contains("active")) {
-            tab.style.backgroundColor = '#FFFFFF';
-        }
-    });
-
-    saveTabsToLocalStorage(tabsWrapper);
-}
-
-function loadTabsFromLocalStorage(tabsWrapper, contentContainer) {
-    const savedTabs = JSON.parse(localStorage.getItem("tabs")) || [];
-    savedTabs.forEach(tabData => {
-        createTab(tabsWrapper, contentContainer, tabData.tabName);
-    });
-}
 
 function saveTabsToLocalStorage(tabsWrapper) {
     const tabs = [];
@@ -478,16 +585,14 @@ function saveTabsToLocalStorage(tabsWrapper) {
     localStorage.setItem("tabs", JSON.stringify(tabs));
 }
 
-function loadMenusFromLocalStorage(tabName, menuWrapper) {
-    const savedMenus = JSON.parse(localStorage.getItem("tabMenus")) || {};
-    const menus = savedMenus[tabName] || [];
-    menuWrapper.innerHTML = ''; // Nettoyer avant de charger les menus
-
-    menus.forEach(menuName => {
-        const menu = createMenu(menuName, menuWrapper);
-        menuWrapper.appendChild(menu);
+function loadTabsFromLocalStorage(tabsWrapper, contentContainer) {
+    const savedTabs = JSON.parse(localStorage.getItem("tabs")) || [];
+    savedTabs.forEach(tabData => {
+        createTab(tabsWrapper, contentContainer, tabData.tabName);
     });
 }
+
+
 
 function saveMenusToLocalStorage(tabName, menuWrapper) {
     if (!tabName) {
@@ -508,115 +613,18 @@ function saveMenusToLocalStorage(tabName, menuWrapper) {
     updateTabMenu(tabName, menus);
 }
 
-function createTabs(container) {
-    const tabContainer = document.createElement("div");
-    tabContainer.classList.add("TabContainer");
-    tabContainer.style.border = "1px solid #FFFFFF";
-    tabContainer.style.overflowX = "scroll";
+function loadMenusFromLocalStorage(tabName, menuWrapper) {
+    const savedMenus = JSON.parse(localStorage.getItem("tabMenus")) || {};
+    const menus = savedMenus[tabName] || [];
+    menuWrapper.innerHTML = ''; // Nettoyer avant de charger les menus
 
-    const tabsWrapper = document.createElement("div");
-
-    const contentContainer = document.createElement("div"); // Sous-conteneur pour le contenu des onglets
-    contentContainer.classList.add("ContentContainer");
-    contentContainer.style.width = "100%";
-    contentContainer.style.height = "100%";
-    contentContainer.style.color = "#FFFFFF";
-    contentContainer.style.backgroundColor = "#333";
-
-    const saveTabsToLocalStorage = () => {
-        const tabTexts = Array.from(tabsWrapper.children).map(tab => tab.querySelector('span').innerText);
-        localStorage.setItem('tabs', JSON.stringify(tabTexts));
-    };
-
-    const createTab = (text = "Annonces listées") => {
-        const tab = document.createElement("div");
-        tab.style.alignItems = "center";
-        tab.style.height = "50px";
-        tab.style.border = "1px solid #ccc";
-        tab.style.borderRadius = "4px";
-        tab.style.backgroundColor = "#FFFFFF";
-        tab.style.cursor = "pointer";
-    
-        const tabContent = document.createElement("span");
-        tabContent.style.flexGrow = "1";
-        tabContent.innerText = text;
-        tab.appendChild(tabContent);
-    
-        // Ajout du double-clic pour éditer le nom de l'onglet
-        tabContent.addEventListener("dblclick", () => {
-            const input = document.createElement("input");
-            input.type = "text";
-            input.value = tabContent.innerText;
-            input.style.flexGrow = "1";
-    
-            // Lorsque l'utilisateur termine l'édition (perte de focus ou touche Entrée)
-            input.addEventListener("blur", () => {
-                tabContent.innerText = input.value;
-                tab.replaceChild(tabContent, input);  // Remplacer le champ de texte par le texte mis à jour
-                saveTabsToLocalStorage();  // Sauvegarder les nouveaux noms des onglets
-            });
-    
-            input.addEventListener("keydown", (e) => {
-                if (e.key === "Enter") {
-                    input.blur();  // Simuler la perte de focus lorsque l'utilisateur appuie sur Entrée
-                }
-            });
-    
-            tab.replaceChild(input, tabContent);  // Remplacer le texte par un champ de texte
-            input.focus();  // Mettre le focus sur le champ pour que l'utilisateur puisse immédiatement commencer à taper
-        });
-    
-        tab.addEventListener("click", () => {
-            // Vider uniquement le sous-conteneur de contenu (et non l'ensemble du container)
-            contentContainer.innerHTML = ''; 
-    
-            const contentDiv = document.createElement("div");
-            contentDiv.classList.add("ContentDiv")
-            contentDiv.style.color = "#FFFFFF";
-            contentDiv.style.display = "flex";
-            contentDiv.style.flexGrow = "1";
-            contentDiv.style.width = "100%";
-            contentDiv.style.height = "100%";
-            contentDiv.style.backgroundColor = "#555";
-            contentDiv.innerText = `Contenu de l'onglet ${tabContent.innerText}`;
-    
-            contentContainer.appendChild(contentDiv);
-        });
-    
-        const closeButton = document.createElement("span");
-        closeButton.innerHTML = "&times;";
-        closeButton.style.cursor = "pointer";
-        closeButton.style.color = "#000000";
-        closeButton.style.display = "flex";
-        closeButton.style.justifyContent = "center";
-        closeButton.style.alignItems = "center";
-        closeButton.style.marginLeft = "5px";
-        closeButton.addEventListener("click", (event) => {
-            event.stopPropagation();
-            tab.remove();
-            saveTabsToLocalStorage();  // Sauvegarder les onglets après suppression
-        });
-    
-        tab.appendChild(closeButton);
-        tabsWrapper.appendChild(tab);
-    };
-
-    // Fonction pour charger les onglets depuis le localStorage
-    const loadTabsFromLocalStorage = () => {
-        const savedTabs = JSON.parse(localStorage.getItem('tabs'));
-        if (savedTabs && savedTabs.length > 0) {
-            savedTabs.forEach(text => createTab(text));
-        } else {
-            createTab();  // Créer un onglet par défaut si aucun onglet n'est trouvé
-        }
-    };
-
-    container.appendChild(tabContainer);
-    tabContainer.appendChild(tabsWrapper);
-    container.appendChild(contentContainer);
-
-    loadTabsFromLocalStorage();  // Charger les onglets lors de l'initialisation
+    menus.forEach(menuName => {
+        const menu = createMenu(menuName, menuWrapper);
+        menuWrapper.appendChild(menu);
+    });
 }
+
+
 
 async function GetData(route, container, includeTabs = false) {
     container.innerHTML = '';

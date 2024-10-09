@@ -44,7 +44,6 @@ mongoose.connect(process.env.MONGO_URI, {
 app.get('/api/annonces/listed', async (req, res) => {
     try {
         const annonces = await ListedAnnonces.find();
-        console.log("Annonces listées:", annonces);  // Ajouter ce log
         res.json(annonces);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -86,7 +85,6 @@ app.delete('/api/annonces/listed', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
-
 
 
 // Route pour associer une catégorie à une annonce
