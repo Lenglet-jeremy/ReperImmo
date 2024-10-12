@@ -3,11 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="/1.0.SideBar/1.0.SideBar.css">
-    <link rel="stylesheet" href="/2.0.ToolsMenu/1.0.ToolsMenu.css">
-    <link rel="stylesheet" href="/3.0.ToolsBar/1.0.ToolsBar.css">
-    <link rel="stylesheet" href="/4.0.Content/1.0.content.css">
+    
+    <!-- Preload des CSS pour éviter le FOUC -->
+    <link rel="preload" href="index.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="index.css"></noscript>
+
+    <link rel="preload" href="Front/1.0.SideBar/1.0.SideBar.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="Front/1.0.SideBar/1.0.SideBar.css"></noscript>
+
+    <link rel="preload" href="Front/2.0.ToolsMenu/1.0.ToolsMenu.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="Front/2.0.ToolsMenu/1.0.ToolsMenu.css"></noscript>
+
+    <link rel="preload" href="Front/3.0.ToolsBar/1.0.ToolsBar.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="Front/3.0.ToolsBar/1.0.ToolsBar.css"></noscript>
+
+    <link rel="preload" href="Front/4.0.Content/1.0.content.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="Front/4.0.Content/1.0.content.css"></noscript>
+
     <title>ReperImmo</title>
 </head>
 <body>
@@ -15,7 +27,6 @@
         <div class="ReperImmoArea">
             <div id="sidebar"></div>
             <div id="toolsMenu"></div>
-
             <div class="Body">
                 <div class="BodyArea">
                     <div id="toolsBar"></div>
@@ -25,26 +36,18 @@
         </div>
     </div>
 
-    <!-- Charge l'ensemble des fonction JS -->
-     <script src="/2.0.ToolsMenu/1.0.ToolsMenu.js"></script>
-    <script src="/3.0.ToolsBar/1.0.ToolsBar.js"></script>
-    <script src="/4.0.Content/1.0.content.js"></script>
+    <!-- Utilisation des nonces pour les scripts inline -->
+    <script nonce="randomValue" src="./2.0.ToolsMenu/1.0.ToolsMenu.js"></script>
+    <script nonce="randomValue" src="./3.0.ToolsBar/1.0.ToolsBar.js"></script>
+    <script nonce="randomValue" src="./4.0.content/1.0.content.js"></script>
 
+    <script nonce="randomValue">loadAnnonces()</script>
 
-    <script>loadAnnonces()</script>
-
-    <!-- Lorsque le DOM est complètement chargé, les différentes parties HTML sont injectées dans la page -->
-    <script>
+    <script nonce="randomValue">
         document.addEventListener('DOMContentLoaded', function () {
             loadPartial('sidebar', './1.0.sideBar/1.0.sideBar.html');
-
-            // Injection de toolsMenu.html dans la div toolsMenu plus haut
-            // Et met à disposition le contenu de toolsMEnu dans la fonction filtre dans le fichier content.js
             loadPartial('toolsMenu', './2.0.toolsMenu/1.0.toolsMenu.html', filtres);
-
-            // Même logique
             loadPartial('toolsBar', './3.0.toolsBar/1.0.toolsBar.html', gestionAnnonces);
-
             loadPartial('content', './4.0.content/1.0.content.html');
         });
 
