@@ -25,6 +25,11 @@ app.use(cors({
     allowedHeaders: 'Content-Type,Authorization',
     credentials: true  // Autoriser les cookies si nécessaires
 }));
+
+app.get('/', (req, res) => {
+    res.send('Welcome to ReperImmo!');
+  });
+  
   
 app.use(express.json());
 
