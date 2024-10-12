@@ -32,6 +32,18 @@ app.use((req, res, next) => {
     next();
 });
 
+// Helmet avec Content-Security-Policy, utilisant des nonce pour les scripts et styles inline
+app.use(helmet.contentSecurityPolicy({
+    directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "https://reperimmo-98b01b670620.herokuapp.com", (req, res) => `'nonce-${res.locals.nonce}'`],
+        styleSrc: ["'self'", "https://reperimmo-98b01b670620.herokuapp.com", (req, res) => `'nonce-${res.locals.nonce}'`],
+        imgSrc: ["'self'", "data:", "https://reperimmo-98b01b670620.herokuapp.com"],
+        connectSrc: ["'self'", "https://reperimmo-98b01b670620.herokuapp.com"],
+        upgradeInsecureRequests: [],
+    },
+    noSniff: true,  // Pour résoudre le problème avec le type MIME
+}));
 
 // Connexion à MongoDB
 mongoose.connect(process.env.MONGO_URI, {
