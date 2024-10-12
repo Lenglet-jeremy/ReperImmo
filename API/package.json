@@ -11,5 +11,7 @@
   },
   "scripts": {
     "start": "nodemon server.js"
-  }
+  },
+  "proxy": "http://localhost:5000"
+
 }
