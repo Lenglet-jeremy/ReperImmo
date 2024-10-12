@@ -18,6 +18,13 @@ app.use(cors({
     allowedHeaders: 'Content-Type,Authorization',
     credentials: true
 }));
+app.use(helmet.contentSecurityPolicy({
+    directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "https://reperimmo-98b01b670620.herokuapp.com"],
+        styleSrc: ["'self'", "https://reperimmo-98b01b670620.herokuapp.com"],
+    },
+}));
 
 // Middleware pour servir des fichiers statiques à partir du dossier Front
 app.use(express.static(path.join(__dirname, '../Front')));
