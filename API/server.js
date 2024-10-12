@@ -8,19 +8,11 @@ const ListedAnnonces = require('./models/ListedAnnonces');  // Importer le modè
 
 // Middleware pour permettre les requêtes cross-origin (depuis un autre domaine)
 app.use(cors({
-    origin: 'https://reperimmo.netlify.app/', 
+    origin: 'https://reperimmo.netlify.app',  // Assurez-vous qu'il n'y a pas de barre oblique finale
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: 'Content-Type,Authorization',
-    credentials: true // Si tu veux envoyer des cookies, ajoute cette option
+    credentials: true  // Autoriser les cookies si nécessaires
 }));
-
-app.use((req, res, next) => {
-res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-res.header('Access-Control-Allow-Credentials', 'true'); // Si tu utilises des cookies
-next();
-});
   
 app.use(express.json());
 
