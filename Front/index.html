@@ -30,12 +30,12 @@
     <script src="/3.0.ToolsBar/1.0.ToolsBar.js"></script>
     <script src="/4.0.Content/1.0.content.js"></script>
 
-    <script nonce="<%= nonce %>">
+    <script>
         loadAnnonces();
     </script>
 
     <!-- Lorsque le DOM est complètement chargé, les différentes parties HTML sont injectées dans la page -->
-    <script nonce="<%= nonce %>">
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
             loadPartial('sidebar', './1.0.sideBar/1.0.sideBar.html');
 
