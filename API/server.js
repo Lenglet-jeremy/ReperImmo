@@ -8,9 +8,10 @@ const ListedAnnonces = require('./models/ListedAnnonces');  // Importer le modè
 
 // Middleware pour permettre les requêtes cross-origin (depuis un autre domaine)
 app.use(cors({
-    origin: 'http://localhost:5000', // Autoriser uniquement cette origine
-    methods: 'GET,POST,PUT,DELETE',  // Définir les méthodes HTTP permises
-    allowedHeaders: 'Content-Type,Authorization'  // Autoriser les headers spécifiques
+    origin: 'http://localhost:3000', // Front-end sur le port 3000
+    methods: 'GET,POST,PUT,DELETE',
+    allowedHeaders: 'Content-Type,Authorization',
+    credentials: true // Si tu veux envoyer des cookies, ajoute cette option
   }));
   
 app.use(express.json());

@@ -39,6 +39,7 @@ let selectedCategories = [];
 
 function loadAnnonces(BudgetMin = 0, BudgetMax = 1000000000, SurfaceMin = 0, SurfaceMax = 1000000, NbPiecesMin = 0, NbPiecesMax = 1000, categories = [], sortOrder = 'asc') {
     fetch(`http://localhost:5000/api/annonces`)
+
         .then(response => response.json())
         .then(data => {
             let annoncesMasquees = JSON.parse(localStorage.getItem('annoncesMasquees')) || [];
