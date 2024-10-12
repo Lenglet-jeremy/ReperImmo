@@ -4,38 +4,25 @@ const cors = require('cors');
 require("dotenv").config();
 const app = express();
 const AnnoncesGlobale = require('./models/annoncesGlobale');
-const ListedAnnonces = require('./models/ListedAnnonces');  // Importer le modèle pour les annonces listées
+const ListedAnnonces = require('./models/ListedAnnonces');  
 const helmet = require('helmet');
-const path = require('path');
+const path = require('path');  // Assurez-vous d'importer le module path
 
+// Middleware pour la sécurité
+app.use(helmet());
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "https://reperimmo.onrender.com"],
-      imgSrc: ["'self'", "https://reperimmo.onrender.com", "data:"],
-      styleSrc: ["'self'", "'unsafe-inline'"]
-    },
-  },
-}));
-
-// Middleware pour permettre les requêtes cross-origin (depuis un autre domaine)
+// Middleware pour permettre les requêtes cross-origin
 app.use(cors({
-    origin: 'https://reperimmo.netlify.app',  // Assurez-vous qu'il n'y a pas de barre oblique finale
+    origin: 'https://reperimmo.netlify.app',  // Changez cela si nécessaire
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: 'Content-Type,Authorization',
-    credentials: true  // Autoriser les cookies si nécessaires
+    credentials: true
 }));
 
 // Middleware pour servir des fichiers statiques à partir du dossier Front
 app.use(express.static(path.join(__dirname, '../Front')));
 
-// Route principale
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../Front/index.html')); // Changez 'index.html' par le nom de votre fichier d'entrée
-});
-  
+// Middleware pour parser le JSON
 app.use(express.json());
 
 // Connexion à MongoDB
@@ -46,7 +33,10 @@ mongoose.connect(process.env.MONGO_URI, {
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('Could not connect to MongoDB:', err));
 
-
+// Route principale
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Front/index.html')); 
+});
 
 // Route pour récupérer les annonces listées
 app.get('/api/annonces/listed', async (req, res) => {
@@ -60,29 +50,24 @@ app.get('/api/annonces/listed', async (req, res) => {
     }
 });
 
-
 // Route pour ajouter une annonce à la liste des annonces listées
 app.post('/api/annonces/listed', async (req, res) => {
     try {
         const { id } = req.body;
 
-        // Vérifier si l'annonce est déjà dans la liste
         const annonceExistante = await ListedAnnonces.findOne({ _id: id });
         if (annonceExistante) {
             return res.status(400).json({ message: "L'annonce est déjà listée." });
         }
 
-        // Trouver l'annonce dans la base de données globale
         const annonce = await AnnoncesGlobale.findById(id);
         if (!annonce) {
             return res.status(404).json({ message: "Annonce non trouvée." });
         }
 
-        // Créer une nouvelle annonce dans la collection ListedAnnonces
         const newAnnonce = new ListedAnnonces({
-            title: annonce.Titre,   // Utilisez les bons noms de champs
+            title: annonce.Titre,
             image: annonce.Image
-            // Ajoutez d'autres champs nécessaires ici
         });
 
         await newAnnonce.save();
@@ -93,7 +78,6 @@ app.post('/api/annonces/listed', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
-
 
 // Route pour retirer une annonce de la liste des annonces listées
 app.delete('/api/annonces/listed', async (req, res) => {
@@ -107,7 +91,6 @@ app.delete('/api/annonces/listed', async (req, res) => {
     }
 });
 
-// Routes restantes inchangées...
 
 
 // Route pour associer une catégorie à une annonce
@@ -128,64 +111,16 @@ app.post('/api/annonces/category', async (req, res) => {
     }
 });
 
-
-
 // Route pour récupérer les annonces visibles
 app.get('/api/annonces', async (req, res) => {
     try {
-        
         let annonces = await AnnoncesGlobale.find();
-        // console.log("Annonces récupérés : ", annonces);
-        res.json({annonces});
+        res.json({ annonces });
     } catch (err) {
         console.error('Erreur lors de la récupération des annonces:', err);
         res.status(500).json({ message: err.message });
     }
 });
-
-// Route pour masquer une annonce
-app.put('/api/annonces/hide', async (req, res) => {
-    try {
-        const annonceId = req.body.id;
-        const annonce = await AnnoncesGlobale.findByIdAndUpdate(annonceId, { toDisplay: false }, { new: true });
-        if (!annonce) {
-            return res.status(404).json({ message: 'Annonce non trouvée' });
-        }
-        res.json({ message: 'Annonce masquée avec succès' });
-    } catch (err) {
-        console.error('Erreur lors du masquage de l\'annonce:', err);
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Route pour récupérer les annonces cachées
-app.get('/api/annonces/hidden', async (req, res) => {
-    try {
-        let annoncesCachees = await AnnoncesGlobale.find({ toDisplay: false });
-        res.json(annoncesCachees);
-    } catch (err) {
-        console.error('Erreur lors de la récupération des annonces cachées:', err);
-        res.status(500).json({ message: err.message });
-    }
-});
-
-
-// Route pour réafficher une annonce masquée
-app.put('/api/annonces/show', async (req, res) => {
-    try {
-        const annonceId = req.body.id;
-        const annonce = await AnnoncesGlobale.findByIdAndUpdate(annonceId, { toDisplay: true }, { new: true });
-        if (!annonce) {
-            return res.status(404).json({ message: 'Annonce non trouvée' });
-        }
-        res.json({ message: 'Annonce réaffichée avec succès' });
-    } catch (err) {
-        console.error('Erreur lors du réaffichage de l\'annonce:', err);
-        res.status(500).json({ message: err.message });
-    }
-});
-
-
 
 // Lancer le serveur sur le port 5000
 const PORT = process.env.PORT || 5000;
