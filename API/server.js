@@ -28,9 +28,10 @@ app.use(express.json());
 
 
 app.use((req, res, next) => {
-    res.locals.nonce = Buffer.from(crypto.randomBytes(16)).toString('base64');
+    res.locals.nonce = Buffer.from(Math.random().toString()).toString('base64');
     next();
 });
+
 
 app.use(helmet.contentSecurityPolicy({
     directives: {
