@@ -26,7 +26,16 @@ app.get('*.css', (req, res, next) => {
 
 
 
-app.use(helmet());
+app.use(helmet.contentSecurityPolicy({
+    directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "https://reperimmo-98b01b670620.herokuapp.com"],
+        styleSrc: ["'self'", "https://reperimmo-98b01b670620.herokuapp.com"],
+        imgSrc: ["'self'", "data:", "https://reperimmo-98b01b670620.herokuapp.com"],  // Autoriser les images externes si nécessaire
+        objectSrc: ["'none'"],  // Désactive Flash, Java, autres objets intégrés
+        upgradeInsecureRequests: [],  // Optionnel: force HTTPS
+    },
+}));
 
 
 
