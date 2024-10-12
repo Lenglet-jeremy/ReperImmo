@@ -7,11 +7,12 @@ const AnnoncesGlobale = require('./models/AnnoncesGlobale');
 const ListedAnnonces = require('./models/ListedAnnonces');  // Importer le modèle pour les annonces listées
 
 // Middleware pour permettre les requêtes cross-origin (depuis un autre domaine)
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+app.use(cors({
+    origin: 'http://localhost:3000', // Autoriser uniquement cette origine
+    methods: 'GET,POST,PUT,DELETE',  // Définir les méthodes HTTP permises
+    allowedHeaders: 'Content-Type,Authorization'  // Autoriser les headers spécifiques
+  }));
+  
 app.use(express.json());
 
 // Connexion à MongoDB
