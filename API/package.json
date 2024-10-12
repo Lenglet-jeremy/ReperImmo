@@ -11,7 +11,7 @@
   },
   "scripts": {
     "start": "node API/server.js",
-    "dev": "nodemon API/server.js"
+    "dev": "node API/server.js"
   },
   "proxy": "http://localhost:5000"
 
