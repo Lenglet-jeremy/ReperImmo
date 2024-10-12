@@ -30,13 +30,25 @@ app.get('/', (req, res) => {
     res.send('Welcome to ReperImmo!');
   });
   
+
+// Middleware pour servir des fichiers statiques à partir du dossier Front
+app.use(express.static(path.join(__dirname, '../Front')));
+
+// Route principale
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Front/index.html')); // Changez 'index.html' par le nom de votre fichier d'entrée
+});
   
 app.use(express.json());
 
 // Connexion à MongoDB
-mongoose.connect(process.env.MONGO_URI, process.env.MONGO_OPTIONS)
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('Could not connect to MongoDB:', err));
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => console.error('Could not connect to MongoDB:', err));
+
 
 
 // Route pour récupérer les annonces listées
