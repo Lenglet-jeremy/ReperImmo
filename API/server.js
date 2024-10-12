@@ -8,7 +8,7 @@ const ListedAnnonces = require('./models/ListedAnnonces');  // Importer le modè
 
 // Middleware pour permettre les requêtes cross-origin (depuis un autre domaine)
 app.use(cors({
-    origin: '*', 
+    origin: 'http://localhost:5000/api/annonces', 
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: 'Content-Type,Authorization',
     credentials: true // Si tu veux envoyer des cookies, ajoute cette option
