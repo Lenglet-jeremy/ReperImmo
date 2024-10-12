@@ -26,31 +26,22 @@ app.use(express.static(path.join(__dirname, '../Front')));
 // Middleware JSON
 app.use(express.json());
 
-// Générateur de nonce pour chaque requête
+
 app.use((req, res, next) => {
-    res.locals.nonce = Buffer.from(Date.now().toString()).toString('base64');
+    res.locals.nonce = Buffer.from(crypto.randomBytes(16)).toString('base64');
     next();
 });
 
-// Helmet avec Content-Security-Policy, utilisant des nonce pour les scripts et styles inline
 app.use(helmet.contentSecurityPolicy({
     directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: [
-            "'self'", 
-            "https://reperimmo-98b01b670620.herokuapp.com", 
-            (req, res) => `'nonce-${res.locals.nonce}'`
-        ],
-        styleSrc: [
-            "'self'", 
-            "https://reperimmo-98b01b670620.herokuapp.com", 
-            (req, res) => `'nonce-${res.locals.nonce}'`
-        ],
+        scriptSrc: ["'self'", (req, res) => `'nonce-${res.locals.nonce}'`],
+        styleSrc: ["'self'", (req, res) => `'nonce-${res.locals.nonce}'`],
         imgSrc: ["'self'", "data:", "https://reperimmo-98b01b670620.herokuapp.com"],
         connectSrc: ["'self'", "https://reperimmo-98b01b670620.herokuapp.com"],
         upgradeInsecureRequests: [],
     },
-    noSniff: false,  // Pour résoudre le problème avec le type MIME
+    noSniff: false,
 }));
 
 // Connexion à MongoDB
