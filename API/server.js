@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require("dotenv").config();
 const app = express();
-const AnnoncesGlobale = require('./models/AnnoncesGlobale');
+const AnnoncesGlobale = require('./models/annoncesGlobale');
 const ListedAnnonces = require('./models/ListedAnnonces');  // Importer le modèle pour les annonces listées
 
 // Middleware pour permettre les requêtes cross-origin (depuis un autre domaine)
