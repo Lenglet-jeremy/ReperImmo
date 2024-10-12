@@ -6,6 +6,8 @@ const app = express();
 const AnnoncesGlobale = require('./models/annoncesGlobale');
 const ListedAnnonces = require('./models/ListedAnnonces');  // Importer le modèle pour les annonces listées
 const helmet = require('helmet');
+const path = require('path');
+
 
 app.use(helmet({
   contentSecurityPolicy: {
@@ -25,11 +27,6 @@ app.use(cors({
     allowedHeaders: 'Content-Type,Authorization',
     credentials: true  // Autoriser les cookies si nécessaires
 }));
-
-app.get('/', (req, res) => {
-    res.send('Welcome to ReperImmo!');
-  });
-  
 
 // Middleware pour servir des fichiers statiques à partir du dossier Front
 app.use(express.static(path.join(__dirname, '../Front')));
