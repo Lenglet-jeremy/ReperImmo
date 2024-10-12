@@ -36,13 +36,21 @@ app.use((req, res, next) => {
 app.use(helmet.contentSecurityPolicy({
     directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "https://reperimmo-98b01b670620.herokuapp.com", (req, res) => `'nonce-${res.locals.nonce}'`],
-        styleSrc: ["'self'", "https://reperimmo-98b01b670620.herokuapp.com", (req, res) => `'nonce-${res.locals.nonce}'`],
+        scriptSrc: [
+            "'self'", 
+            "https://reperimmo-98b01b670620.herokuapp.com", 
+            (req, res) => `'nonce-${res.locals.nonce}'`
+        ],
+        styleSrc: [
+            "'self'", 
+            "https://reperimmo-98b01b670620.herokuapp.com", 
+            (req, res) => `'nonce-${res.locals.nonce}'`
+        ],
         imgSrc: ["'self'", "data:", "https://reperimmo-98b01b670620.herokuapp.com"],
         connectSrc: ["'self'", "https://reperimmo-98b01b670620.herokuapp.com"],
         upgradeInsecureRequests: [],
     },
-    noSniff: true,  // Pour résoudre le problème avec le type MIME
+    noSniff: false,  // Pour résoudre le problème avec le type MIME
 }));
 
 // Connexion à MongoDB
@@ -55,7 +63,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Route principale
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../Front/index.html'));
+    res.render('index', { nonce: res.locals.nonce });  // Utilisation du moteur de template pour passer le nonce
 });
 
 // Route pour récupérer les annonces listées

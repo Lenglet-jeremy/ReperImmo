@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' '; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' 'unsafe-eval';">
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="/1.0.SideBar/1.0.SideBar.css">
     <link rel="stylesheet" href="/2.0.ToolsMenu/1.0.ToolsMenu.css">
@@ -26,26 +25,22 @@
         </div>
     </div>
 
-    <!-- Charge l'ensemble des fonction JS -->
-     <script src="/2.0.ToolsMenu/1.0.ToolsMenu.js"></script>
-    <script src="/3.0.ToolsBar/1.0.ToolsBar.js"></script>
-    <script src="/4.0.Content/1.0.content.js"></script>
+    <!-- Charge l'ensemble des fonctions JS -->
+    <script nonce="<%= nonce %>" src="/2.0.ToolsMenu/1.0.ToolsMenu.js"></script>
+    <script nonce="<%= nonce %>" src="/3.0.ToolsBar/1.0.ToolsBar.js"></script>
+    <script nonce="<%= nonce %>" src="/4.0.Content/1.0.content.js"></script>
 
-
-    <script>loadAnnonces()</script>
+    <script nonce="<%= nonce %>">
+        loadAnnonces();
+    </script>
 
     <!-- Lorsque le DOM est complètement chargé, les différentes parties HTML sont injectées dans la page -->
-    <script>
+    <script nonce="<%= nonce %>">
         document.addEventListener('DOMContentLoaded', function () {
             loadPartial('sidebar', './1.0.sideBar/1.0.sideBar.html');
 
-            // Injection de toolsMenu.html dans la div toolsMenu plus haut
-            // Et met à disposition le contenu de toolsMEnu dans la fonction filtre dans le fichier content.js
             loadPartial('toolsMenu', './2.0.toolsMenu/1.0.toolsMenu.html', filtres);
-
-            // Même logique
             loadPartial('toolsBar', './3.0.toolsBar/1.0.toolsBar.html', gestionAnnonces);
-
             loadPartial('content', './4.0.content/1.0.content.html');
         });
 
