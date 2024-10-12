@@ -32,19 +32,6 @@ app.use((req, res, next) => {
     next();
 });
 
-
-app.use(helmet.contentSecurityPolicy({
-    directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", (req, res) => `'nonce-${res.locals.nonce}'`],
-        styleSrc: ["'self'", (req, res) => `'nonce-${res.locals.nonce}'`],
-        imgSrc: ["'self'", "data:", "https://reperimmo-98b01b670620.herokuapp.com"],
-        connectSrc: ["'self'", "https://reperimmo-98b01b670620.herokuapp.com"],
-        upgradeInsecureRequests: [],
-    },
-    noSniff: false,
-}));
-
 // Connexion à MongoDB
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -52,11 +39,6 @@ mongoose.connect(process.env.MONGO_URI, {
 })
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('Could not connect to MongoDB:', err));
-
-// Route principale
-app.get('/', (req, res) => {
-    res.render('index', { nonce: res.locals.nonce });  // Utilisation du moteur de template pour passer le nonce
-});
 
 // Route pour récupérer les annonces listées
 app.get('/api/annonces/listed', async (req, res) => {
