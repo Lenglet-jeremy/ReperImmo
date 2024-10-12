@@ -5,6 +5,18 @@ require("dotenv").config();
 const app = express();
 const AnnoncesGlobale = require('./models/annoncesGlobale');
 const ListedAnnonces = require('./models/ListedAnnonces');  // Importer le modèle pour les annonces listées
+const helmet = require('helmet');
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://reperimmo.onrender.com"],
+      imgSrc: ["'self'", "https://reperimmo.onrender.com", "data:"],
+      styleSrc: ["'self'", "'unsafe-inline'"]
+    },
+  },
+}));
 
 // Middleware pour permettre les requêtes cross-origin (depuis un autre domaine)
 app.use(cors({
