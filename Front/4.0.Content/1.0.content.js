@@ -39,7 +39,7 @@ let selectedCategories = [];
 
 function loadAnnonces(BudgetMin = 0, BudgetMax = Infinity, SurfaceMin = 0, SurfaceMax = Infinity, NbPiecesMin = 0, NbPiecesMax = Infinity, categories = [], sortOrder = 'asc') {
     // Remplacer l'appel à l'API par l'appel au fichier JSON
-    fetch('../../../API/data/everyDBData.json') // Chemin vers ton fichier JSON
+    fetch('./public/data/everyDBData.json') // Chemin vers ton fichier JSON
         .then(response => response.json())
         .then(data => {
             
@@ -85,6 +85,8 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = Infinity, SurfaceMin = 0, Surfa
             const contentDiv = document.querySelector(".Content");
             
             contentDiv.innerHTML = "";
+            console.log(contentDiv);
+            
             contentDiv.style.display = "flex";
             contentDiv.style.flexWrap = "wrap";
             contentDiv.style.justifyContent = "center";
