@@ -38,20 +38,18 @@ let selectedCategories = [];
 
 
 function loadAnnonces(BudgetMin = 0, BudgetMax = Infinity, SurfaceMin = 0, SurfaceMax = Infinity, NbPiecesMin = 0, NbPiecesMax = Infinity, categories = [], sortOrder = 'asc') {
-    fetch(`http://localhost:5000/api/annonces`)
-
+    // Remplacer l'appel à l'API par l'appel au fichier JSON
+    fetch('../../../API/data/everyDBData.json') // Chemin vers ton fichier JSON
         .then(response => response.json())
         .then(data => {
+            
             let annoncesMasquees = JSON.parse(localStorage.getItem('annoncesMasquees')) || [];
         
-            
-            let filteredAnnonces = data.annonces.filter(annonce => {
+            let filteredAnnonces = data.filter(annonce => {
                 let prixAnnonce = annonce.Prix;
                 let surfaceAnnonce = annonce.Surface;
                 let nbPiecesAnnonce = annonce.NombreDePieces;
                 let firstWord = annonce.TypeDeBien;
-                let pro = annonce.Pro;
-                
 
                 // Filtrer les annonces masquées
                 return annonce.ToDisplay &&
@@ -60,7 +58,7 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = Infinity, SurfaceMin = 0, Surfa
                     nbPiecesAnnonce >= NbPiecesMin && nbPiecesAnnonce <= NbPiecesMax &&
                     (categories.length === 0 || categories.includes(firstWord)) &&
                     !annoncesMasquees.includes(annonce.id);
-            }); // Jouer avec les filtre pour afficher toutes les annon de base mais sans casser le filtre
+            });
 
             // Ajout du tri par prix au m²
             if (sortOrder === "PrixMCarreCroissant") {
@@ -83,8 +81,9 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = Infinity, SurfaceMin = 0, Surfa
                 });
             }
 
-            // Affichage des annonces
+            // Affichage des annonces (idem à ton code d'origine)
             const contentDiv = document.querySelector(".Content");
+            
             contentDiv.innerHTML = "";
             contentDiv.style.display = "flex";
             contentDiv.style.flexWrap = "wrap";
@@ -96,8 +95,6 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = Infinity, SurfaceMin = 0, Surfa
             contentDiv.style.padding = "20px";
 
             filteredAnnonces.forEach(annonce => {
-                
-                
                 const annonceDiv = document.createElement("div");
                 annonceDiv.classList.add("annonce-card");
 
@@ -137,21 +134,19 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = Infinity, SurfaceMin = 0, Surfa
                 const price = document.createElement('h2');
                 price.innerHTML = `${Number(annonce.Prix).toLocaleString('fr-FR')} €`;
                 price.style.color = "#000000";
-                price.style.margin = "0";  // Pour éviter tout margin par défaut
+                price.style.margin = "0";
 
                 // Conteneur pour le prix au m² et "FAI"
                 const pricePerSquareMeterContainer = document.createElement('div');
                 pricePerSquareMeterContainer.style.display = "flex";
                 pricePerSquareMeterContainer.style.alignItems = "center";
-                pricePerSquareMeterContainer.style.gap = "5px";  // Espace entre prix et FAI
+                pricePerSquareMeterContainer.style.gap = "5px";
 
-                // Prix au mètre carré
                 const pricePerSquareMeter = document.createElement('p');
                 pricePerSquareMeter.innerHTML = `${Number(annonce.PrixAuMCarre).toLocaleString('fr-FR')} €/m²`;
-                pricePerSquareMeter.style.fontSize = "0.8em";  // Plus petit que le prix principal
+                pricePerSquareMeter.style.fontSize = "0.8em";
                 pricePerSquareMeter.style.color = "#666";
 
-                // Mention FAI si Pro === true
                 if (annonce.Pro === true) {
                     const faiElement = document.createElement('span');
                     faiElement.innerHTML = "FAI";
@@ -163,16 +158,12 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = Infinity, SurfaceMin = 0, Surfa
                     pricePerSquareMeterContainer.appendChild(pricePerSquareMeter);
                 }
 
-                // Appliquer un style "flex" aligné à gauche
                 priceLine.style.display = "flex";
-                priceLine.style.alignItems = "center";  // Aligner verticalement au centre
-                priceLine.style.gap = "5px";  // Ajouter un petit espace entre le prix et le prix au m²
+                priceLine.style.alignItems = "center";
+                priceLine.style.gap = "5px";
 
-                // Ajouter les deux éléments dans priceLine
                 priceLine.appendChild(price);
                 priceLine.appendChild(pricePerSquareMeterContainer);
-
-
 
                 // Surface et nombre de pièces
                 const detailsLine = document.createElement('div');
@@ -228,10 +219,7 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = Infinity, SurfaceMin = 0, Surfa
 
                 textContainer.appendChild(viewButton);
 
-                // Ajout du conteneur texte à l'annonceDiv
                 annonceDiv.appendChild(textContainer);
-
-                // Ajout de l'annonce à l'élément parent (contentDiv)
                 contentDiv.appendChild(annonceDiv);
             });
 
@@ -239,14 +227,15 @@ function loadAnnonces(BudgetMin = 0, BudgetMax = Infinity, SurfaceMin = 0, Surfa
             const nombreAnnonces = document.createElement("p");
             nombreAnnonces.style.width = "100%";
             nombreAnnonces.style.fontSize = "18px";
-            nombreAnnonces.style.fontWeight = "bold";
             nombreAnnonces.style.textAlign = "center";
-            nombreAnnonces.style.marginBottom = "20px";
-            nombreAnnonces.innerText = `Nombre d'annonces : ${filteredAnnonces.length}`;
+            nombreAnnonces.innerHTML = `${filteredAnnonces.length} annonces trouvées.`;
             contentDiv.prepend(nombreAnnonces);
         })
-        .catch(error => console.error("Erreur lors du chargement des annonces:", error));
+        .catch(error => {
+            console.error("Erreur lors du chargement du fichier JSON :", error);
+        });
 }
+
 
 
 
