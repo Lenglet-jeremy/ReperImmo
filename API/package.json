@@ -10,8 +10,8 @@
     "nodemon": "^3.1.7"
   },
   "scripts": {
-    "start": "node API/server.js",
-    "dev": "node API/server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "proxy": "http://localhost:5000"
 
