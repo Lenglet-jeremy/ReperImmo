@@ -32,9 +32,9 @@ mongoose.connect(process.env.MONGO_URI, process.env.MONGO_OPTIONS)
 
 // Fonction pour vérifier et créer le dossier /data
 const ensureDataFolderExists = () => {
-    const dataFolderPath = path.join(__dirname, 'data'); // Obtenir le chemin du dossier /data
+    const dataFolderPath = path.join(__dirname, '..', 'Front', 'public', 'data'); // Obtenir le chemin du dossier /data
     if (!fs.existsSync(dataFolderPath)) { // Vérifier si le dossier n'existe pas
-        fs.mkdirSync(dataFolderPath); // Créer le dossier
+        fs.mkdirSync(dataFolderPath, { recursive: true }); // Créer le dossier avec une option récursive
         console.log('Dossier /data créé.');
     }
 };
@@ -45,7 +45,7 @@ const saveDataToJSON = async () => {
         ensureDataFolderExists(); // Assurer que le dossier /data existe
 
         const allAnnonces = await AnnoncesGlobale.find();  // Récupérer toutes les annonces
-        const dataPath = path.join(__dirname, 'data', 'everyDBData.json');  // Chemin du fichier JSON
+        const dataPath = path.join(__dirname, '..', 'Front', 'public', 'data', 'everyDBData.json');  // Chemin du fichier JSON
 
         // Écrire les données dans le fichier
         fs.writeFileSync(dataPath, JSON.stringify(allAnnonces, null, 2), 'utf-8');
@@ -85,7 +85,6 @@ app.post('/api/annonces/listed', async (req, res) => {
         });
         await newAnnonce.save();
 
-
         res.status(201).json({ message: "Annonce ajoutée avec succès." });
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -114,7 +113,6 @@ app.post('/api/annonces/category', async (req, res) => {
             return res.status(404).json({ message: "Annonce non trouvée." });
         }
 
-
         res.status(200).json({ message: "Catégorie ajoutée avec succès." });
     } catch (err) {
         console.error("Erreur lors de l'ajout de la catégorie:", err);
@@ -131,7 +129,6 @@ app.get('/api/annonces', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
-
 
 // Lancer le serveur sur le port 5000
 const PORT = process.env.PORT || 5000;
