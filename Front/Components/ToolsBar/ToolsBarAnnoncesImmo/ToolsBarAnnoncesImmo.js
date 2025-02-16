@@ -6,13 +6,12 @@ function initMarkupComportement() {
     setupAdditions();
     setupAnnoncesListees();
     setupCloseListAnnonces();
-    loadFromLocalStorage(); // Charger les données sauvegardées
+    loadFromLocalStorage();
 }
 
-// 🔹 Stockage des menus et contenus pour chaque onglet
 let tabData = {};
+let tabCount = 0;
 
-// 🔹 Gérer l'édition des éléments (onglets et menus)
 function setupEditing(selector) {
     document.querySelectorAll(selector).forEach(element => {
         element.addEventListener("dblclick", () => {
@@ -21,9 +20,19 @@ function setupEditing(selector) {
             input.value = element.innerText;
             input.style.flexGrow = "1";
 
+            const oldTabName = element.innerText.trim();
+
             input.addEventListener("blur", () => {
-                element.innerText = input.value;
+                const newTabName = input.value.trim();
+                element.innerText = newTabName;
                 input.replaceWith(element);
+
+                // Copy the content from the old tab name to the new tab name
+                if (oldTabName !== newTabName) {
+                    tabData[newTabName] = tabData[oldTabName];
+                    delete tabData[oldTabName];
+                }
+
                 saveToLocalStorage();
             });
 
@@ -37,14 +46,14 @@ function setupEditing(selector) {
     });
 }
 
-// 🔹 Gérer la suppression des éléments
+
 function setupDeletion(selector) {
     document.querySelectorAll(selector).forEach(button => {
         button.addEventListener("click", () => {
             const parent = button.parentElement;
             if (parent.classList.contains("Tab")) {
                 const tabName = parent.querySelector(".TabName").innerText.trim();
-                delete tabData[tabName]; // Supprimer les menus liés à l'onglet
+                delete tabData[tabName];
             }
             parent.remove();
             saveToLocalStorage();
@@ -52,19 +61,18 @@ function setupDeletion(selector) {
     });
 }
 
-// 🔹 Ajouter un nouvel onglet ou menu
 function setupAdditions() {
     document.querySelector(".AddTabButton button").addEventListener("click", () => addNewElement("tab"));
     document.querySelector(".MenusControlPanel button").addEventListener("click", () => addNewElement("menu"));
 }
 
 function addNewElement(type) {
-    let container = type === "tab" ? document.querySelector(".Tabs") : document.querySelector(".Menus");
-    let element = document.createElement("div");
+    const container = type === "tab" ? document.querySelector(".Tabs") : document.querySelector(".Menus");
+    const element = document.createElement("div");
     element.classList.add(type === "tab" ? "Tab" : "Menu");
-
-    let content = type === "tab"
-        ? `<p class="TabName">Nouvel Onglet</p><button class="DeleteTab">X</button>`
+    tabCount++;
+    const content = type === "tab"
+        ? `<p class="TabName">Nouvel Onglet ${tabCount}</p><button class="DeleteTab">X</button>`
         : `<p>Nouvel Menu</p><button class="deleteMenu">X</button>`;
 
     element.innerHTML = content;
@@ -82,6 +90,11 @@ function addNewElement(type) {
         const activeTab = document.querySelector(".Tab.active");
         if (!activeTab) return;
         const tabName = activeTab.querySelector(".TabName").innerText.trim();
+
+        if (!tabData[tabName]) {
+            tabData[tabName] = { menus: {}, selectedMenu: null };
+        }
+
         const menuName = `Menu ${Object.keys(tabData[tabName].menus).length + 1}`;
         tabData[tabName].menus[menuName] = "Contenu par défaut";
         updateMenuDisplay(tabName);
@@ -90,20 +103,17 @@ function addNewElement(type) {
     saveToLocalStorage();
 }
 
-// 🔹 Sauvegarde dans le LocalStorage
 function saveToLocalStorage() {
     localStorage.setItem("tabData", JSON.stringify(tabData));
 }
 
-// 🔹 Chargement depuis le LocalStorage
 function loadFromLocalStorage() {
     tabData = JSON.parse(localStorage.getItem("tabData")) || {};
-
     const tabContainer = document.querySelector(".Tabs");
     tabContainer.innerHTML = "";
 
     Object.keys(tabData).forEach(tabName => {
-        let tab = document.createElement("div");
+        const tab = document.createElement("div");
         tab.classList.add("Tab");
         tab.innerHTML = `<p class="TabName">${tabName}</p><button class="DeleteTab">X</button>`;
         tab.addEventListener("click", () => activateTab(tab));
@@ -118,19 +128,22 @@ function loadFromLocalStorage() {
     setupDeletion(".DeleteTab");
 }
 
-// 🔹 Activation d'un onglet et mise à jour des menus associés
 function activateTab(tabElement) {
     document.querySelectorAll(".Tab").forEach(tab => tab.classList.remove("active"));
     tabElement.classList.add("active");
 
     const tabName = tabElement.querySelector(".TabName").textContent.trim();
+
+    if (!tabData[tabName]) {
+        tabData[tabName] = { menus: {}, selectedMenu: null };
+    }
+
     updateMenuDisplay(tabName);
 }
 
-// 🔹 Mise à jour des menus pour l'onglet actif
 function updateMenuDisplay(tabName) {
     const menusContainer = document.querySelector(".ListAnnonceMenus .Menus");
-    menusContainer.innerHTML = ""; 
+    menusContainer.innerHTML = "";
 
     if (tabData[tabName]) {
         Object.keys(tabData[tabName].menus).forEach(menu => {
@@ -145,21 +158,55 @@ function updateMenuDisplay(tabName) {
                 saveToLocalStorage();
             });
 
-            menuElement.querySelector("p").addEventListener("click", () => {
+            const menuNameElement = menuElement.querySelector("p");
+            menuNameElement.addEventListener("click", () => {
                 tabData[tabName].selectedMenu = menu;
                 updateMenuContent(tabName);
+            });
+
+            // Add double-click event listener to rename the menu
+            menuNameElement.addEventListener("dblclick", () => {
+                const input = document.createElement("input");
+                input.type = "text";
+                input.value = menuNameElement.innerText;
+                input.style.flexGrow = "1";
+
+                const oldMenuName = menuNameElement.innerText.trim();
+
+                input.addEventListener("blur", () => {
+                    const newMenuName = input.value.trim();
+                    menuNameElement.innerText = newMenuName;
+                    input.replaceWith(menuNameElement);
+
+                    // Copy the content from the old menu name to the new menu name
+                    if (oldMenuName !== newMenuName) {
+                        tabData[tabName].menus[newMenuName] = tabData[tabName].menus[oldMenuName];
+                        delete tabData[tabName].menus[oldMenuName];
+                        tabData[tabName].selectedMenu = newMenuName;
+                    }
+
+                    saveToLocalStorage();
+                });
+
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") input.blur();
+                });
+
+                menuNameElement.replaceWith(input);
+                input.focus();
             });
         });
     }
 }
 
-// 🔹 Mise à jour du contenu affiché pour le menu sélectionné
+
 function updateMenuContent(tabName) {
     const menuContentElement = document.querySelector(".MenuContent p");
     const selectedMenu = tabData[tabName].selectedMenu;
 
     if (selectedMenu) {
-        menuContentElement.innerText = tabData[tabName].menus[selectedMenu];
+        const contentMessage = `Contenu du menu ${selectedMenu} de l'onglet ${tabName}`;
+        menuContentElement.innerText = contentMessage;
 
         menuContentElement.addEventListener("dblclick", () => {
             const input = document.createElement("input");
@@ -186,14 +233,13 @@ function updateMenuContent(tabName) {
     }
 }
 
-// 🔹 Gérer l'affichage de ListAnnonceInterface
+
 function setupAnnoncesListees() {
     document.querySelector(".AnnoncesListees").addEventListener("click", () => {
         document.querySelector(".ListAnnonceInterface").style.display = "flex";
     });
 }
 
-// 🔹 Gérer la fermeture de ListAnnonceManager
 function setupCloseListAnnonces() {
     document.querySelector(".CloseListAnnonces").addEventListener("click", () => {
         document.querySelector(".ListAnnonceInterface").style.display = "none";
