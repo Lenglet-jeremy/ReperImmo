@@ -201,37 +201,50 @@ function updateMenuDisplay(tabName) {
 
 
 function updateMenuContent(tabName) {
-    const menuContentElement = document.querySelector(".MenuContent p");
+    const menuContentElement = document.querySelector(".MenuContent");
     const selectedMenu = tabData[tabName].selectedMenu;
 
     if (selectedMenu) {
-        const contentMessage = `Contenu du menu ${selectedMenu} de l'onglet ${tabName}`;
-        menuContentElement.innerText = contentMessage;
+        const annonces = tabData[tabName].menus[selectedMenu];
+        if (Array.isArray(annonces) && annonces.length > 0) {
+            // Clear the current content
+            menuContentElement.innerHTML = '';
 
-        menuContentElement.addEventListener("dblclick", () => {
-            const input = document.createElement("input");
-            input.type = "text";
-            input.value = menuContentElement.innerText;
-            input.style.flexGrow = "1";
+            // Append each announcement to the menu content
+            annonces.forEach((annonceHTML, index) => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = annonceHTML;
+                const clone = tempDiv.querySelector('.Annonce').cloneNode(true);
+                clone.querySelector('.AddToListButton').style.display = 'none'; // Hide the "+" button
 
-            input.addEventListener("blur", () => {
-                tabData[tabName].menus[selectedMenu] = input.value;
-                menuContentElement.innerText = input.value;
-                input.replaceWith(menuContentElement);
-                saveToLocalStorage();
+                // Add event listener to the "X" button
+                const hideButton = clone.querySelector('.HideToListButton');
+                hideButton.addEventListener('click', () => {
+                    // Remove the announcement from the menu
+                    annonces.splice(index, 1);
+                    updateMenuContent(tabName); // Update the display
+                    saveToLocalStorage();
+                });
+
+                menuContentElement.appendChild(clone);
+
+                // Add a separator if it's not the last announcement
+                if (index < annonces.length - 1) {
+                    const separator = document.createElement('hr');
+                    menuContentElement.appendChild(separator);
+                }
             });
-
-            input.addEventListener("keydown", (e) => {
-                if (e.key === "Enter") input.blur();
-            });
-
-            menuContentElement.replaceWith(input);
-            input.focus();
-        });
+        } else {
+            menuContentElement.innerHTML = "<p>Aucune annonce dans ce menu</p>";
+        }
     } else {
-        menuContentElement.innerText = "Sélectionnez un menu";
+        menuContentElement.innerHTML = "<p>Sélectionnez un menu</p>";
     }
 }
+
+
+
+
 
 
 function setupAnnoncesListees() {

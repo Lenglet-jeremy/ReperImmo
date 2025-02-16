@@ -49,6 +49,7 @@ async function getdata(route) {
     }
 }
 
+
 async function LoadAnnonces() {
     let annoncesContainer = document.querySelector(".ContentAnnoncesImmo");
     let templateAnnonce = document.querySelector(".Annonce");
@@ -141,5 +142,71 @@ async function LoadAnnonces() {
 
         annonceClone.style.display = "block";
         annoncesContainer.appendChild(AnnonceImmoTemplate(annonceClone));
+
+        // Add event listener to the "+" button
+        annonceClone.querySelector(".AddToListButton").addEventListener("click", () => {
+            showMenuSelectionPopup(annonceClone);
+        });
     }
+}
+
+function showMenuSelectionPopup(annonce) {
+    // Create a popup container
+    const popupContainer = document.createElement("div");
+    popupContainer.classList.add("MenuSelectionPopup");
+    popupContainer.style.position = "fixed";
+    popupContainer.style.top = "50%";
+    popupContainer.style.left = "50%";
+    popupContainer.style.transform = "translate(-50%, -50%)";
+    popupContainer.style.backgroundColor = "white";
+    popupContainer.style.border = "1px solid #ccc";
+    popupContainer.style.padding = "20px";
+    popupContainer.style.boxShadow = "0 2px 10px rgba(0,0,0,0.1)";
+    popupContainer.style.zIndex = "1000";
+    popupContainer.style.maxHeight = "80vh";
+    popupContainer.style.overflowY = "auto";
+
+    const title = document.createElement("h3");
+    title.textContent = "Sélectionnez un menu";
+    popupContainer.appendChild(title);
+
+    const menuList = document.createElement("ul");
+
+    // Iterate over all tabs and their menus
+    Object.keys(tabData).forEach(tabName => {
+        const tabMenus = tabData[tabName].menus;
+        Object.keys(tabMenus).forEach(menu => {
+            const menuItem = document.createElement("li");
+            menuItem.textContent = `${tabName} - ${menu}`;
+            menuItem.style.cursor = "pointer";
+            menuItem.style.padding = "10px";
+            menuItem.style.borderBottom = "1px solid #eee";
+
+            menuItem.addEventListener("click", () => {
+                // Add the announcement to the selected menu's list
+                if (!Array.isArray(tabData[tabName].menus[menu])) {
+                    tabData[tabName].menus[menu] = [];
+                }
+                tabData[tabName].menus[menu].push(annonce.outerHTML);
+                updateMenuContent(tabName); // Call the existing function
+                saveToLocalStorage();
+                popupContainer.remove();
+            });
+
+            menuList.appendChild(menuItem);
+        });
+    });
+
+    popupContainer.appendChild(menuList);
+
+    // Add a close button
+    const closeButton = document.createElement("button");
+    closeButton.textContent = "Fermer";
+    closeButton.style.marginTop = "20px";
+    closeButton.addEventListener("click", () => {
+        popupContainer.remove();
+    });
+    popupContainer.appendChild(closeButton);
+
+    document.body.appendChild(popupContainer);
 }
