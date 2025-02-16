@@ -1,0 +1,227 @@
+.ContentAnnoncesImmo{
+    height: 100%;
+    width: calc(100vw - 500px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow-y: scroll;
+}
+
+.Annonce{
+    width: 450px;
+    height: 300px;
+    border: 1px solid #152c46;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    display: none;
+
+    .MainLine{
+        display: flex;
+        justify-content: space-between;
+        padding: 15px;
+        border-bottom: 1px solid #152c46;
+    }
+
+    .ControlButtons{
+        display: flex;
+        gap: 10px;
+    }
+
+    .AddToListButton{
+        width: 30px;
+        height: 30px;
+        background-color: #00FF00;
+        color: #152c46;
+    }
+
+    .HideToListButton{
+        width: 30px;
+        height: 30px;
+        background-color: #FF0000;
+        color: #152c46;
+    }
+
+    .TemplateAnnonceBody{
+        display: flex;
+        flex-direction: row;
+        padding-left: 15px;
+        padding-top: 15px;
+        width: calc(100% - 30px);
+        height: calc(100% - 90px);
+
+        .Lines{
+            display: flex;
+            flex-direction: column;
+
+
+            .CostLine{
+                width: 250px;
+                height: 20px;
+                display: flex;
+                padding-left: 15px;
+                padding-bottom: 5px;
+                justify-content: space-between;
+    
+            }
+            .SurfaceLine{
+                width: 250px;
+                height: 20px;
+                display: flex;
+                padding-left: 15px;
+                padding-bottom: 5px;
+                justify-content: space-between;
+            }
+            .TypeOfPropertyContainer{
+                width: 250px;
+                height: 20px;
+                display: flex;
+                padding-left: 15px;
+                padding-bottom: 5px;
+                justify-content: space-between;
+            }
+            .Location{
+                width: 250px;
+                display: flex;
+                padding-left: 15px;
+                padding-bottom: 5px;
+                justify-content: space-between;
+            }
+            .DPE_GES{
+                width: 250px;
+                display: flex;
+                padding-left: 15px;
+                padding-bottom: 5px;
+                justify-content: space-between;
+            }
+            .UpdateDate{
+                width: 250px;
+                display: flex;
+                padding-left: 15px;
+                padding-bottom: 5px;
+                justify-content: space-between;
+            }
+            .LinkMarkUp {
+                display: flex;
+                flex-direction: row;
+                height: 50px;
+                margin-left: 15px;
+                margin-top: 15px;
+                justify-content: center;
+                align-items: center;
+                position: relative; /* Ajouté pour positionner l'enfant absolu */
+            }
+            
+            .LinkValue {
+                position: relative;
+                background-color: #ffffff;
+                width: 100%;
+                height: 100%;
+                color: #152c46;
+                margin-right: 10px;
+                display: flex; /* Pour centrer le texte */
+                justify-content: center;
+                align-items: center;
+                text-decoration: none;
+                color: inherit; /* Pour garder la couleur du texte */
+                font-size: 18px;
+            }
+
+            .Extend{
+                width: 50px;
+                height: 100%;
+            }
+            .LinkValue:link {
+                color: #000000; /* Couleur du lien non visité */
+            }
+            
+            .LinkValue:visited {
+                color: #818181; /* Couleur du lien déjà visité */
+            }
+            
+            .LinkValue:hover {
+                color: #ffffff; /* Couleur au survol */
+                background-color: #152c46; /* Fond qui change au survol */
+            }
+            
+            .LinkValue:active {
+                color: #ff4500; /* Couleur quand on clique dessus */
+            }
+            
+
+        }
+
+        .Carousel{
+            position: relative;
+            bottom: 0px;
+            width: 250px;
+            overflow: hidden;
+
+            .CarouselInner{
+                
+                .Slide{
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    transition: opacity 0.5s;
+
+                    .Image{
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                }
+            }
+
+            .PrevButton{
+                position: absolute;
+                top: 50%;
+                left: 1px;
+                transform: translateY(-50%);
+                background-color: rgba(0, 0, 0, 0.527);
+                color : #FFFFFF;
+                border : none;
+                padding: 10px;
+                cursor: pointer;
+                font-size: 24px;
+                border-radius: 5px;
+            }
+
+            .NextButton{
+                position: absolute;
+                top: 50%;
+                right: 1px;
+                transform: translateY(-50%);
+                background-color: rgba(0, 0, 0, 0.527);
+                color : #FFFFFF;
+                border : none;
+                padding: 10px;
+                cursor: pointer;
+                font-size: 24px;
+                border-radius: 5px;
+            }
+
+            .Indicators{
+                position: absolute;
+                bottom: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+                width: 100%;
+                justify-content: center;
+
+                .Dot{
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+}

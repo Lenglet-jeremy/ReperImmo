@@ -1,0 +1,202 @@
+<div class="RealEstateAds">
+    <div class="Title">
+        <p>Annonces immobilières</p>
+    </div>
+    
+    <div class="Filters">
+        <div class="Searchs">
+            <p class="SearchTitle">Recherches Sauvegardés : </p>
+            <select name="SearchChoice" id="SearchChoice" class="SearchChoiceSelector">
+                <option selected value="Search1">Recherche 1 </option>
+                <option value="Search2">Recherche 2 </option>
+                <option value="Search3">Recherche 3 </option>
+                <option value="Search4">Recherche 4 </option>
+                <option value="Search5">Recherche 5 </option>
+            </select>
+        </div>
+    
+
+
+        <div class="Sort">
+            <label class="TitleSort">Option de tri :</label>
+            <select id="SortChoice" name="SortChoice" class="SortChoiceSelector">
+            <option selected value="IncreasingPrice">Prix Croissant</option>
+            <option value="DescendingPrice">Prix Décroissant</option>
+            <option value="PricePerM2Increasing">Prix au M² Croissant</option>
+            <option value="PricePerM2Descending">Prix au M² Décroissant</option>
+            <option value="GrowingIncreasing">Surface Croissante</option>
+            <option value="GrowingDescending">Surface Décroissante</option>
+            <option value="Older">Le plus Ancien</option>
+            <option value="Newer">Le plus Recent</option>
+            </select>
+        </div>
+
+        <div class="TypeOfProperty">
+            <form action="#" method="post">
+            <fieldset>
+                <legend class="TypeOfPropertyTitle">Types de biens :</legend>
+                    <div class="Checkboxs">
+                        <label>
+                        <input type="checkbox" name="property-type" value="maison"> Maison
+                        </label><br>
+                
+                        <label>
+                        <input type="checkbox" name="property-type" value="appartement"> Appartement
+                        </label><br>
+                
+                        <label>
+                        <input type="checkbox" name="property-type" value="immeuble"> Immeuble
+                        </label><br>
+                
+                        <label>
+                        <input type="checkbox" name="property-type" value="garage"> Garage
+                        </label><br>
+                
+                        <label>
+                        <input type="checkbox" name="property-type" value="loft"> Loft
+                        </label><br>
+                
+                        <label>
+                        <input type="checkbox" name="property-type" value="villa"> Villa
+                        </label><br>
+                
+                        <label>
+                        <input type="checkbox" name="property-type" value="terrain"> Terrain
+                        </label><br>
+                
+                        <label>
+                        <input type="checkbox" name="property-type" value="autre"> Autre
+                        </label>
+                    </div>
+            </fieldset>
+        </div>
+
+
+        <!-- Budget -->
+        <div class="Budget">
+            <label class="BudgetTitle">Budget (€)</label>
+            <div class="inlineGroup">
+                <input type="number" placeholder="Min">
+                <input type="number" placeholder="Max">
+            </div>
+        </div>
+
+        <!-- Surface -->
+        <div class="Surface">
+            <label class="SurfaceTitle">Surface (m²)</label>
+            <div class="inlineGroup">
+                <input type="number" placeholder="Min">
+                <input type="number" placeholder="Max">
+            </div>
+        </div>
+
+        <!-- Nombre de pièces -->
+        <div class="PiecesNumber">
+            <label class="PiecesNumberTitle">Nombre de pièces</label>
+            <div class="inlineGroup">
+                <input type="number" placeholder="Min">
+                <input type="number" placeholder="Max">
+            </div>
+        </div>
+
+        <!-- Recherche par ville et rayon -->
+        <div class="City">
+            <label>Ville</label>
+            <input type="text" placeholder="Entrez une ville">
+        </div>
+        <div class="Radius">
+            <label>Rayon (km)</label>
+            <input type="number" placeholder="Rayon">
+        </div>
+
+        <!-- Type d'annonceur -->
+        <div class="AdvertiserType">
+            <label>Type d'annonceur</label>
+            <select>
+                <option value="">Tous</option>
+                <option value="pro">Professionnel</option>
+                <option value="particulier">Particulier</option>
+            </select>
+        </div>
+
+        <!-- Type d'annonce -->
+        <div class="AdType">
+            <label>Type d'annonce</label>
+            <select>
+                <option value="">Tous</option>
+                <option value="vente">Vente</option>
+                <option value="location">Location</option>
+            </select>
+        </div>
+
+        <!-- Surface terrain -->
+        <div class="SurfaceLand">
+            <label class="SurfaceLandTitle">Surface terrain (m²)</label>
+            <div class="inlineGroup">
+                <input type="number" placeholder="Min">
+                <input type="number" placeholder="Max">
+            </div>
+        </div>
+
+        <!-- Nombre de chambres -->
+        <div class="RoomsNumber">
+            <label class="RoomsNumberTitle">Nombre de chambres</label>
+            <div class="inlineGroup">
+                <input type="number" placeholder="Min">
+                <input type="number" placeholder="Max">
+            </div>
+        </div>
+
+        <!-- Plus de critères -->
+        <div class="MoreCriteria">
+            <label class="MoreCriteriaTitle">Plus de critères</label>
+            <div>
+                <label><input type="checkbox"> Ancien</label>
+                <label><input type="checkbox"> Neuf</label>
+                <label><input type="checkbox"> Viager</label>
+                <label><input type="checkbox"> Projet de construction</label>
+            </div>
+        </div>
+
+        <!-- Extérieur -->
+        <div class="Outside">
+            <label class="OutsideTitle">Extérieur</label>
+            <div>
+                <label><input type="checkbox"> Jardin</label>
+                <label><input type="checkbox"> Piscine</label>
+                <label><input type="checkbox"> Balcon</label>
+            </div>
+        </div>
+
+        <!-- Annexes -->
+        <div class="Appendix">
+            <label class="AppendixTitle">Annexes</label>
+            <div>
+                <label><input type="checkbox"> Parking</label>
+                <label><input type="checkbox"> Box</label>
+                <label><input type="checkbox"> Garage</label>
+                <label><input type="checkbox"> Cave</label>
+                <label><input type="checkbox"> Sous-sol</label>
+            </div>
+        </div>
+
+        <!-- Indices -->
+        <div class="PolutionIndex">
+            <label>Indice Pollution</label>
+            <input type="number" placeholder="Max">
+        </div>
+        <div class="EnergyIndex">
+            <label>Indice Énergétique</label>
+            <input type="number" placeholder="Max">
+        </div>
+
+    </div>
+
+
+
+    <div class="ControlPanel">
+        <p>Réinitialiser</p>
+        <p>Sauvegarder</p>
+        <p>Profils</p>
+    </div>
+</div>

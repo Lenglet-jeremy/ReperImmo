@@ -1,0 +1,187 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+
+:root {
+    --BackgroundColor : #000000;
+    --ForegroundColor : #c4deff;
+    --HideListAnnonces : #1a1a1a;
+
+
+    --MenusBarContainer-width: 200px;
+    --MenuBarContainer-width: 300px;
+
+    --ToolsBarHeight: 50px;
+    --StatusBarHeight: 50px;
+}
+
+
+/* ===================================== */
+/* ========= START COLOR THEME ========= */
+/* ===================================== */
+
+body{
+    background-color: var(--BackgroundColor);
+    width: 100vw;
+    height: 100vh;
+}
+
+p{
+    color: var(--ForegroundColor);
+}
+
+h2{
+    color: var(--ForegroundColor);
+}
+
+h3{
+    color: var(--ForegroundColor);
+}
+
+.MenusBarContainer{
+    width: var(--MenusBarContainer-width);
+    height: calc(100vh - 2px);
+    border: 1px solid #152c46;
+}
+
+.MenuBarContainer{
+    width: var(--MenuBarContainer-width);
+    height: calc(100vh - 2px);
+    border: 1px solid #152c46;
+}
+
+.ToolsBarContainer{
+    width: calc(100vw - var(--MenusBarContainer-width) - var(--MenuBarContainer-width));
+    height: var(--ToolsBarHeight);
+    border: 1px solid #152c46;
+}
+
+.ContentContainer{
+    border: 1px solid #152c46;
+    height: calc(100vh - var(--ToolsBarHeight) - var(--StatusBarHeight) - 6px);
+}
+
+.StatusBarContainer{
+    border: 1px solid #152c46;
+    height: var(--StatusBarHeight);
+    width: calc(100% - 2px);
+}
+
+.MenuButton{
+    color: var(--ForegroundColor);
+}
+
+.Search{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+}
+
+.DeleteSearch{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+}
+
+.Sort{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+}
+
+.TypeOfProperty{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+}
+
+.Budget{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+    
+}
+
+.Surface{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+    
+}
+
+.PiecesNumber{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+    
+}
+
+.City{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+
+}
+
+.Radius{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+    
+}
+
+.AdvertiserType{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+    
+}
+
+.AdType{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+    
+}
+
+.SurfaceLand{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+    
+}
+
+.RoomsNumber{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+    
+}
+
+.MoreCriteria{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+    
+}
+
+.Outside{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+    
+}
+
+.Appendix{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+    
+}
+
+.PolutionIndex{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+    
+}
+
+.EnergyIndex{
+    background-color: var(--BackgroundColor);
+    color: var(--ForegroundColor);
+    
+}
+
+
+/* =================================== */
+/* ========= END COLOR THEME ========= */
+/* =================================== */
+
+body{
+    display: flex;
+    flex-direction: row;
+}

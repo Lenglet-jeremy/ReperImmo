@@ -1,0 +1,61 @@
+.MenuButton {
+    cursor: pointer;
+    transition: color 0.2s, background-color 0.2s; 
+    background-color: #00000000;
+    border: none;
+}
+
+.MenuButton:hover {
+    color: #6487af; /* Couleur du texte au survol */
+}
+
+.Home{
+    display: flex;
+    flex-shrink: 0;
+    width: 100%;
+    height: 50px;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    border-bottom: 1px solid #152c46;
+
+    .LOGO{
+        height: auto;
+        width: 150px;
+    }
+
+}
+
+
+.MenuButton{
+    padding: 5px 15px;
+}
+
+.MenusBar{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+.GlobalMenus{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    height: 100%;
+    width: 100%;
+    border-top: 1px solid #152c46;
+    border-bottom: 1px solid #152c46;
+}
+
+.Account{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    border-top: 1px solid #152c46;
+    width: 100%;
+    height: 50px;
+
+}
