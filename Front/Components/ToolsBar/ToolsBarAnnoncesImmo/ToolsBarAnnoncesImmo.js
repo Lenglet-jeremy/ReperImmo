@@ -1,5 +1,3 @@
-document.addEventListener("DOMContentLoaded", initMarkupComportement);
-
 function initMarkupComportement() {
     setupEditing(".TabName");
     setupEditing(".Menu p");
@@ -8,10 +6,11 @@ function initMarkupComportement() {
     setupAdditions();
     setupAnnoncesListees();
     setupCloseListAnnonces();
-
-
-    loadFromLocalStorage();  // Charger les données sauvegardées
+    loadFromLocalStorage(); // Charger les données sauvegardées
 }
+
+// 🔹 Stockage des menus et contenus pour chaque onglet
+let tabData = {};
 
 // 🔹 Gérer l'édition des éléments (onglets et menus)
 function setupEditing(selector) {
@@ -25,7 +24,7 @@ function setupEditing(selector) {
             input.addEventListener("blur", () => {
                 element.innerText = input.value;
                 input.replaceWith(element);
-                saveToLocalStorage();  // Sauvegarde après modification
+                saveToLocalStorage();
             });
 
             input.addEventListener("keydown", (e) => {
@@ -42,8 +41,13 @@ function setupEditing(selector) {
 function setupDeletion(selector) {
     document.querySelectorAll(selector).forEach(button => {
         button.addEventListener("click", () => {
-            button.parentElement.remove();
-            saveToLocalStorage();  // Sauvegarde après suppression
+            const parent = button.parentElement;
+            if (parent.classList.contains("Tab")) {
+                const tabName = parent.querySelector(".TabName").innerText.trim();
+                delete tabData[tabName]; // Supprimer les menus liés à l'onglet
+            }
+            parent.remove();
+            saveToLocalStorage();
         });
     });
 }
@@ -59,25 +63,127 @@ function addNewElement(type) {
     let element = document.createElement("div");
     element.classList.add(type === "tab" ? "Tab" : "Menu");
 
-    let content = type === "tab" 
+    let content = type === "tab"
         ? `<p class="TabName">Nouvel Onglet</p><button class="DeleteTab">X</button>`
-        : `<p>Nouvel Menu</p><button>X</button>`;
+        : `<p>Nouvel Menu</p><button class="deleteMenu">X</button>`;
 
     element.innerHTML = content;
     container.appendChild(element);
 
     setupEditing(type === "tab" ? ".TabName" : ".Menu p");
     setupDeletion(type === "tab" ? ".DeleteTab" : ".Menu button");
+
+    if (type === "tab") {
+        const tabName = element.querySelector(".TabName").innerText.trim();
+        tabData[tabName] = { menus: {}, selectedMenu: null };
+        element.addEventListener("click", () => activateTab(element));
+        activateTab(element);
+    } else {
+        const activeTab = document.querySelector(".Tab.active");
+        if (!activeTab) return;
+        const tabName = activeTab.querySelector(".TabName").innerText.trim();
+        const menuName = `Menu ${Object.keys(tabData[tabName].menus).length + 1}`;
+        tabData[tabName].menus[menuName] = "Contenu par défaut";
+        updateMenuDisplay(tabName);
+    }
+
     saveToLocalStorage();
 }
 
 // 🔹 Sauvegarde dans le LocalStorage
 function saveToLocalStorage() {
-    const tabNames = Array.from(document.querySelectorAll(".TabName")).map(tab => tab.innerText);
-    const menuNames = Array.from(document.querySelectorAll(".Menu p")).map(menu => menu.innerText);
+    localStorage.setItem("tabData", JSON.stringify(tabData));
+}
 
-    localStorage.setItem("tabs", JSON.stringify(tabNames));
-    localStorage.setItem("menus", JSON.stringify(menuNames));
+// 🔹 Chargement depuis le LocalStorage
+function loadFromLocalStorage() {
+    tabData = JSON.parse(localStorage.getItem("tabData")) || {};
+
+    const tabContainer = document.querySelector(".Tabs");
+    tabContainer.innerHTML = "";
+
+    Object.keys(tabData).forEach(tabName => {
+        let tab = document.createElement("div");
+        tab.classList.add("Tab");
+        tab.innerHTML = `<p class="TabName">${tabName}</p><button class="DeleteTab">X</button>`;
+        tab.addEventListener("click", () => activateTab(tab));
+        tabContainer.appendChild(tab);
+    });
+
+    if (Object.keys(tabData).length > 0) {
+        activateTab(document.querySelector(".Tab"));
+    }
+
+    setupEditing(".TabName");
+    setupDeletion(".DeleteTab");
+}
+
+// 🔹 Activation d'un onglet et mise à jour des menus associés
+function activateTab(tabElement) {
+    document.querySelectorAll(".Tab").forEach(tab => tab.classList.remove("active"));
+    tabElement.classList.add("active");
+
+    const tabName = tabElement.querySelector(".TabName").textContent.trim();
+    updateMenuDisplay(tabName);
+}
+
+// 🔹 Mise à jour des menus pour l'onglet actif
+function updateMenuDisplay(tabName) {
+    const menusContainer = document.querySelector(".ListAnnonceMenus .Menus");
+    menusContainer.innerHTML = ""; 
+
+    if (tabData[tabName]) {
+        Object.keys(tabData[tabName].menus).forEach(menu => {
+            const menuElement = document.createElement("div");
+            menuElement.classList.add("Menu");
+            menuElement.innerHTML = `<p>${menu}</p> <button class="deleteMenu">X</button>`;
+            menusContainer.appendChild(menuElement);
+
+            menuElement.querySelector(".deleteMenu").addEventListener("click", () => {
+                delete tabData[tabName].menus[menu];
+                updateMenuDisplay(tabName);
+                saveToLocalStorage();
+            });
+
+            menuElement.querySelector("p").addEventListener("click", () => {
+                tabData[tabName].selectedMenu = menu;
+                updateMenuContent(tabName);
+            });
+        });
+    }
+}
+
+// 🔹 Mise à jour du contenu affiché pour le menu sélectionné
+function updateMenuContent(tabName) {
+    const menuContentElement = document.querySelector(".MenuContent p");
+    const selectedMenu = tabData[tabName].selectedMenu;
+
+    if (selectedMenu) {
+        menuContentElement.innerText = tabData[tabName].menus[selectedMenu];
+
+        menuContentElement.addEventListener("dblclick", () => {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.value = menuContentElement.innerText;
+            input.style.flexGrow = "1";
+
+            input.addEventListener("blur", () => {
+                tabData[tabName].menus[selectedMenu] = input.value;
+                menuContentElement.innerText = input.value;
+                input.replaceWith(menuContentElement);
+                saveToLocalStorage();
+            });
+
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") input.blur();
+            });
+
+            menuContentElement.replaceWith(input);
+            input.focus();
+        });
+    } else {
+        menuContentElement.innerText = "Sélectionnez un menu";
+    }
 }
 
 // 🔹 Gérer l'affichage de ListAnnonceInterface
@@ -92,36 +198,4 @@ function setupCloseListAnnonces() {
     document.querySelector(".CloseListAnnonces").addEventListener("click", () => {
         document.querySelector(".ListAnnonceInterface").style.display = "none";
     });
-}
-
-
-// 🔹 Chargement depuis le LocalStorage
-function loadFromLocalStorage() {
-    const storedTabs = JSON.parse(localStorage.getItem("tabs")) || ["Onglet 1", "Onglet 2", "Onglet 3"];
-    const storedMenus = JSON.parse(localStorage.getItem("menus")) || ["Menu 1", "Menu 2"];
-
-    const tabContainer = document.querySelector(".Tabs");
-    const menuContainer = document.querySelector(".Menus");
-
-    tabContainer.innerHTML = "";  
-    menuContainer.innerHTML = "";
-
-    storedTabs.forEach(name => {
-        let tab = document.createElement("div");
-        tab.classList.add("Tab");
-        tab.innerHTML = `<p class="TabName">${name}</p><button class="DeleteTab">X</button>`;
-        tabContainer.appendChild(tab);
-    });
-
-    storedMenus.forEach(name => {
-        let menu = document.createElement("div");
-        menu.classList.add("Menu");
-        menu.innerHTML = `<p>${name}</p><button>X</button>`;
-        menuContainer.appendChild(menu);
-    });
-
-    setupEditing(".TabName");
-    setupEditing(".Menu p");
-    setupDeletion(".DeleteTab");
-    setupDeletion(".Menu button");
 }
